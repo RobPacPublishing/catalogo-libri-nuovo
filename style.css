@@ -133,15 +133,15 @@ footer {
 /* Media query per dispositivi mobili */
 @media (max-width: 768px) {
     #logo-catalogo {
-        max-height: 100px; /* Riduce la dimensione del logo sui dispositivi mobili */
+        max-height: 100px;
     }
 
     #banner-catalogo {
-        max-height: 200px; /* Riduce la dimensione del banner sui dispositivi mobili */
+        max-height: 200px;
     }
 
     #libri {
-        grid-template-columns: repeat(auto-fit, 80px); /* Riduce la dimensione delle immagini dei libri sui dispositivi mobili */
+        grid-template-columns: repeat(auto-fit, 80px);
     }
 
     .section-libro img {
@@ -150,13 +150,22 @@ footer {
     }
 
     .info-libro {
-        flex-direction: column; /* Cambia la direzione del flex a colonna sui dispositivi mobili */
-        width: 100%; /* Occupa l'intera larghezza dello schermo sui dispositivi mobili */
+        flex-direction: column;
+        width: 100%;
     }
 
     .info-libro img {
-        width: 100%; /* Occupa l'intera larghezza dello schermo sui dispositivi mobili */
-        margin-right: 0; /* Rimuove il margine destro sui dispositivi mobili */
-        margin-bottom: 20px; /* Aggiunge un margine inferiore sui dispositivi mobili */
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+    /* Riduce le dimensioni del titolo e del sottotitolo sui dispositivi mobili */
+    #titolo-container h1 {
+        font-size: 20px;
+    }
+
+    #titolo-container h2 {
+        font-size: 16px;
     }
 }
