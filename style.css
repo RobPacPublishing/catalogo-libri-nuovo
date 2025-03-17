@@ -22,13 +22,14 @@ header {
 
 #logo-container {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 50%; /* Sposta il logo a metà altezza dell'header */
+    left: 20px; /* Sposta il logo verso il banner */
+    transform: translateY(-50%); /* Centra verticalmente il logo */
     z-index: 1;
 }
 
 #logo-catalogo {
-    max-height: 200px;
+    max-height: 250px; /* Aumenta la dimensione del logo */
 }
 
 #banner-catalogo {
@@ -160,7 +161,6 @@ footer {
         margin-bottom: 20px;
     }
 
-    /* Riduce le dimensioni del titolo e del sottotitolo sui dispositivi mobili */
     #titolo-container h1 {
         font-size: 20px;
     }
