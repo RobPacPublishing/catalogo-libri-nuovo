@@ -22,14 +22,14 @@ header {
 
 #logo-container {
     position: absolute;
-    top: 50%; /* Sposta il logo a metà altezza dell'header */
-    left: 20px; /* Sposta il logo verso il banner */
-    transform: translateY(-50%); /* Centra verticalmente il logo */
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
     z-index: 1;
 }
 
 #logo-catalogo {
-    max-height: 250px; /* Aumenta la dimensione del logo */
+    max-height: 250px;
 }
 
 #banner-catalogo {
@@ -44,8 +44,9 @@ main {
 
 #libri {
     display: grid;
-    grid-template-columns: repeat(auto-fit, 100px);
-    gap: 10px;
+    grid-template-columns: repeat(auto-fit, 150px); /* Modifica: Aumenta la larghezza delle colonne */
+    grid-template-rows: auto; /* Modifica: Definisce l'altezza delle righe come automatica */
+    gap: 20px; /* Modifica: Aumenta la spaziatura tra gli elementi */
 }
 
 .section-libro {
@@ -55,8 +56,8 @@ main {
 }
 
 .section-libro img {
-    width: 100px;
-    height: 150px;
+    width: 150px; /* Modifica: Assicura che le immagini occupino l'intera larghezza della colonna */
+    height: 225px; /* Modifica: Imposta un'altezza fissa per le immagini */
     object-fit: cover;
 }
 
@@ -137,7 +138,7 @@ footer {
         max-height: 100px;
     }
 
-    #banner-catalogo {
+    #banner-catal-00 {
         max-height: 200px;
     }
 
