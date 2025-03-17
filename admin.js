@@ -56,13 +56,7 @@ libroForm.addEventListener("submit", function(event) {
             const immagineBase64 = event.target.result;
             libro.immagine = immagineBase64;
 
-            if (libroDaModificare !== null) {
-                modificaLibroInFile(libroDaModificare, libro);
-                libroDaModificare = null;
-                libroForm.querySelector("button").textContent = "Aggiungi libro";
-            } else {
-                aggiungiLibroAlFile(libro);
-            }
+            aggiungiLibroAlFile(libro); // Aggiungi il libro indipendentemente dalla modifica
 
             mostraLibriInseriti();
             libroForm.reset();
@@ -70,13 +64,7 @@ libroForm.addEventListener("submit", function(event) {
 
         reader.readAsDataURL(immagine);
     } else {
-        if (libroDaModificare !== null) {
-            modificaLibroInFile(libroDaModificare, libro);
-            libroDaModificare = null;
-            libroForm.querySelector("button").textContent = "Aggiungi libro";
-        } else {
-            aggiungiLibroAlFile(libro);
-        }
+        aggiungiLibroAlFile(libro); // Aggiungi il libro indipendentemente dalla modifica
 
         mostraLibriInseriti();
         libroForm.reset();
