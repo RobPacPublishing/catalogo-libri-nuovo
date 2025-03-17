@@ -17,18 +17,18 @@ header {
     top: 10px;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 1; /* Assicura che il titolo sia sopra il banner */
+    z-index: 1;
 }
 
 #logo-container {
     position: absolute;
     top: 10px;
     left: 10px;
-    z-index: 1; /* Assicura che il logo sia sopra il banner */
+    z-index: 1;
 }
 
 #logo-catalogo {
-    max-height: 100px;
+    max-height: 200px; /* Ingrandisce il logo del 200% */
 }
 
 #banner-catalogo {
