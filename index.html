@@ -1,31 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RobPac Publishing</title>
+    <title>Catalogo Libri</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 </head>
 <body>
     <header>
-        <div id="logo-container">
-            <img id="logo-catalogo" src="logo3senzasfondo.png" alt="Logo">
-        </div>
-        <div id="titolo-container">
-            <h1>RobPac Publishing</h1>
-            <p>Welcome to our virtual library</p>
-        </div>
-        <img id="banner-catalogo" src="banner-landpage2.png" alt="Banner">
+        <img id="logo-catalogo" src="logo3senzasfondo.png" alt="Logo Catalogo">
+        <img id="banner-catalogo" src="banner-landpage2.png" alt="Banner Catalogo">
     </header>
 
-    <main>
-        <section id="libri"></section>
-        <div id="info-container"></div>
-    </main>
+    <div id="libri">
+        </div>
 
-    <footer>
-        <p>&copy; 2025 RobPac - All Rights Reserved</p>
-    </footer>
+    <div id="info-container">
+        </div>
 
     <script src="script.js"></script>
 </body>
+</html>
