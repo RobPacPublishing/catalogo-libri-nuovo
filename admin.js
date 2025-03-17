@@ -18,12 +18,68 @@ const personalizzazioneForm = document.getElementById("personalizzazione-form");
 libroForm.addEventListener("submit", function(event) {
     event.preventDefault();
 
-    // ... (codice per la raccolta dei dati del libro) ...
+    const titolo = document.getElementById("titolo").value;
+    const autore = document.getElementById("autore").value;
+    const descrizione = document.getElementById("descrizione").value;
+    const linkAmazon = document.getElementById("linkAmazon").value;
+    let immagine = null;
+    if (document.getElementById("immagine").files[0]) {
+        immagine = document.getElementById("immagine").files[0];
+    }
+    const prezzo = document.getElementById("prezzo").value;
+    const valuta = document.getElementById("valuta").value;
+    const formati = [];
+    if (document.getElementById("ebook").checked) {
+        formati.push("eBook");
+    }
+    if (document.getElementById("paperback").checked) {
+        formati.push("Paperback");
+    }
+    if (document.getElementById("hardcover").checked) {
+        formati.push("Hardcover");
+    }
+
+    const libro = {
+        titolo: titolo,
+        autore: autore,
+        descrizione: descrizione,
+        linkAmazon: linkAmazon,
+        prezzo: prezzo,
+        valuta: valuta,
+        formati: formati,
+    };
 
     if (immagine) {
-        // ... (codice per la gestione dell'immagine) ...
+        const reader = new FileReader();
+
+        reader.onload = function(event) {
+            const immagineBase64 = event.target.result;
+            libro.immagine = immagineBase64;
+
+            if (libroDaModificare !== null) {
+                modificaLibroInFile(libroDaModificare, libro);
+                libroDaModificare = null;
+                libroForm.querySelector("button").textContent = "Aggiungi libro";
+            } else {
+                aggiungiLibroAlFile(libro);
+            }
+
+            mostraLibriInseriti();
+            libroForm.reset();
+        };
+
+        reader.readAsDataURL(immagine);
     } else {
-        // ... (codice per l'aggiunta del libro senza immagine) ...
+        if (libroDaModificare !== null) {
+            modificaLibroInFile(libroDaModificare, libro);
+            libroDaModificare = null;
+            libroForm.querySelector("button").textContent = "Aggiungi libro";
+        } else {
+            aggiungiLibroAlFile(libro);
+        }
+
+        mostraLibriInseriti();
+        libroForm.reset();
     }
 });
 
@@ -51,7 +107,7 @@ function mostraLibriInseriti() {
                     <h3>${libro.titolo}</h3>
                     <p>${libro.autore}</p>
                     <p>${libro.descrizione}</p>
-                    <img src="${libro.immagine}" alt="${libro.titolo}" style="max-width: 100px;">
+                    ${libro.immagine ? `<img src="${libro.immagine}" alt="${libro.titolo}" style="max-width: 100px;">` : ''}
                 `;
                 libriInseriti.appendChild(libroDiv);
             });
