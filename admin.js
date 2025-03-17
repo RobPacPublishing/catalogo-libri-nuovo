@@ -45,11 +45,11 @@ libroForm.addEventListener("submit", function(event) {
             };
 
             if (libroDaModificare !== null) {
-                modificaLibroInLocalStorage(libroDaModificare, libro);
+                modificaLibroInFile(libroDaModificare, libro);
                 libroDaModificare = null;
                 libroForm.querySelector("button").textContent = "Aggiungi libro";
             } else {
-                salvaLibro(libro);
+                aggiungiLibroAlFile(libro);
             }
 
             mostraLibriInseriti();
@@ -69,11 +69,11 @@ libroForm.addEventListener("submit", function(event) {
         };
 
         if (libroDaModificare !== null) {
-            modificaLibroInLocalStorage(libroDaModificare, libro);
+            modificaLibroInFile(libroDaModificare, libro);
             libroDaModificare = null;
             libroForm.querySelector("button").textContent = "Aggiungi libro";
         } else {
-            salvaLibro(libro);
+            aggiungiLibroAlFile(libro);
         }
 
         mostraLibriInseriti();
@@ -81,75 +81,107 @@ libroForm.addEventListener("submit", function(event) {
     }
 });
 
-function salvaLibro(libro) {
-    let libri = JSON.parse(localStorage.getItem("libri")) || [];
-    libri.push(libro);
-    localStorage.setItem("libri", JSON.stringify(libri));
+function aggiungiLibroAlFile(libro) {
+    fetch("libri.json")
+        .then(response => response.json())
+        .then(libri => {
+            libri.push(libro);
+            return fetch("libri.json", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+body: JSON.stringify(libri)
+            });
+        });
 }
 
-function modificaLibroInLocalStorage(index, libroModificato) {
-    let libri = JSON.parse(localStorage.getItem("libri")) || [];
-    libri[index] = libroModificato;
-    localStorage.setItem("libri", JSON.stringify(libri));
+function modificaLibroInFile(index, libroModificato) {
+    fetch("libri.json")
+        .then(response => response.json())
+        .then(libri => {
+            libri[index] = libroModificato;
+            return fetch("libri.json", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(libri)
+            });
+        });
 }
 
 function mostraLibriInseriti() {
     libriInseriti.innerHTML = "";
-    const libri = JSON.parse(localStorage.getItem("libri")) || [];
+    fetch("libri.json")
+        .then(response => response.json())
+        .then(libri => {
+            libri.forEach((libro, index) => {
+                const libroDiv = document.createElement("div");
+                libroDiv.classList.add("admin-libro");
 
-    libri.forEach((libro, index) => {
-        const libroDiv = document.createElement("div");
-        libroDiv.classList.add("admin-libro");
+                const immagine = document.createElement("img");
+                immagine.src = libro.immagine;
+                immagine.alt = libro.titolo;
 
-        const immagine = document.createElement("img");
-        immagine.src = libro.immagine;
-        immagine.alt = libro.titolo;
+                const titolo = document.createElement("h3");
+                titolo.textContent = libro.titolo;
 
-        const titolo = document.createElement("h3");
-        titolo.textContent = libro.titolo;
+                const modificaButton = document.createElement("button");
+                modificaButton.textContent = "Modifica";
+                modificaButton.addEventListener("click", function() {
+                    modificaLibro(index);
+                });
 
-        const modificaButton = document.createElement("button");
-        modificaButton.textContent = "Modifica";
-        modificaButton.addEventListener("click", function() {
-            modificaLibro(index);
+                const cancellaButton = document.createElement("button");
+                cancellaButton.textContent = "Cancella";
+                cancellaButton.addEventListener("click", function() {
+                    cancellaLibro(index);
+                });
+
+                libroDiv.appendChild(immagine);
+                libroDiv.appendChild(titolo);
+                libroDiv.appendChild(modificaButton);
+                libroDiv.appendChild(cancellaButton);
+
+                libriInseriti.appendChild(libroDiv);
+            });
         });
-
-        const cancellaButton = document.createElement("button");
-        cancellaButton.textContent = "Cancella";
-        cancellaButton.addEventListener("click", function() {
-            cancellaLibro(index);
-        });
-
-        libroDiv.appendChild(immagine);
-        libroDiv.appendChild(titolo);
-        libroDiv.appendChild(modificaButton);
-        libroDiv.appendChild(cancellaButton);
-
-        libriInseriti.appendChild(libroDiv);
-    });
 }
 
 function modificaLibro(index) {
-    const libri = JSON.parse(localStorage.getItem("libri")) || [];
-    const libro = libri[index];
+    fetch("libri.json")
+        .then(response => response.json())
+        .then(libri => {
+            const libro = libri[index];
 
-    document.getElementById("titolo").value = libro.titolo;
-    document.getElementById("autore").value = libro.autore;
-    document.getElementById("descrizione").value = libro.descrizione;
-    document.getElementById("linkAmazon").value = libro.linkAmazon;
-    document.getElementById("prezzo").value = libro.prezzo;
-    document.getElementById("valuta").value = libro.valuta;
-    document.getElementById("formati").value = libro.formati;
+            document.getElementById("titolo").value = libro.titolo;
+            document.getElementById("autore").value = libro.autore;
+            document.getElementById("descrizione").value = libro.descrizione;
+            document.getElementById("linkAmazon").value = libro.linkAmazon;
+            document.getElementById("prezzo").value = libro.prezzo;
+            document.getElementById("valuta").value = libro.valuta;
+            document.getElementById("formati").value = libro.formati;
 
-    libroDaModificare = index;
-    libroForm.querySelector("button").textContent = "Modifica libro";
+            libroDaModificare = index;
+            libroForm.querySelector("button").textContent = "Modifica libro";
+        });
 }
 
 function cancellaLibro(index) {
-    const libri = JSON.parse(localStorage.getItem("libri")) || [];
-    libri.splice(index, 1);
-    localStorage.setItem("libri", JSON.stringify(libri));
-    mostraLibriInseriti();
+    fetch("libri.json")
+        .then(response => response.json())
+        .then(libri => {
+            libri.splice(index, 1);
+            return fetch("libri.json", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(libri)
+            });
+        })
+        .then(() => mostraLibriInseriti());
 }
 
 mostraLibriInseriti();
