@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -61,4 +62,69 @@
 
     <script src="admin.js"></script>
 </body>
+=======
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pannello di amministrazione</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <h1>Inserisci nuovo libro</h1>
+    <form id="libro-form">
+        <label for="titolo">Titolo:</label>
+        <input type="text" id="titolo" name="titolo" required><br><br>
+
+        <label for="autore">Autore:</label>
+        <input type="text" id="autore" name="autore" required><br><br>
+
+        <label for="descrizione">Descrizione:</label>
+        <textarea id="descrizione" name="descrizione" required></textarea><br><br>
+
+        <label for="linkAmazon">Link Amazon:</label>
+        <input type="url" id="linkAmazon" name="linkAmazon" required><br><br>
+
+        <label for="immagine">Immagine di copertina:</label>
+        <input type="file" id="immagine" name="immagine" accept="image/*"><br><br>
+
+        <label for="prezzo">Price from:</label>
+        <select id="valuta" name="valuta">
+            <option value="$">$</option>
+            <option value="€">€</option>
+            <option value="£">£</option>
+        </select>
+        <input type="number" id="prezzo" name="prezzo" step="0.01" required><br><br>
+
+        <label for="formati">Formats and editions:</label><br>
+        <input type="checkbox" id="ebook" name="formati" value="eBook">
+        <label for="ebook">eBook</label><br>
+        <input type="checkbox" id="paperback" name="formati" value="Paperback">
+        <label for="paperback">Paperback</label><br>
+        <input type="checkbox" id="hardcover" name="formati" value="Hardcover">
+        <label for="hardcover">Hardcover</label><br><br>
+
+        <button type="submit">Aggiungi libro</button>
+    </form>
+
+    <h2>Libri inseriti</h2>
+    <div id="libri-inseriti"></div>
+
+    <h2>Personalizzazione catalogo libri</h2>
+    <form id="personalizzazione-form">
+        <label for="logo">Logo:</label>
+        <input type="file" id="logo" name="logo" accept="image/*"><br><br>
+
+        <label for="banner">Banner:</label>
+        <input type="file" id="banner" name="banner" accept="image/*"><br><br>
+
+        <button type="submit">Salva personalizzazione</button>
+    </form>
+
+    <a href="index.html" target="_blank">Anteprima catalogo libri</a>
+
+    <script src="admin.js"></script>
+</body>
+>>>>>>> 7980d442893f3fe09ea35ab2d22d4fe9ec91affa
 </html>
