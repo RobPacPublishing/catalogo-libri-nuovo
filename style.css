@@ -10,13 +10,31 @@ header {
     padding: 20px;
     text-align: center;
     position: relative;
-    display: flex;
-    flex-direction: column; /* Cambia la direzione del flex a colonna */
-    align-items: center; /* Centra gli elementi orizzontalmente */
 }
 
-header h1, header h2 {
-    margin: 5px 0; /* Aggiunge un po' di spazio sopra e sotto il titolo e il sottotitolo */
+#titolo-container {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1; /* Assicura che il titolo sia sopra il banner */
+}
+
+#logo-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1; /* Assicura che il logo sia sopra il banner */
+}
+
+#logo-catalogo {
+    max-height: 100px;
+}
+
+#banner-catalogo {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
 }
 
 main {
@@ -102,18 +120,6 @@ footer {
     right: 5px;
     cursor: pointer;
     font-size: 20px;
-}
-
-#logo-catalogo {
-    max-height: 350px;
-    position: static;
-    margin-right: 20px;
-}
-
-#banner-catalogo {
-    width: 100%;
-    max-height: 300px;
-    object-fit: contain;
 }
 
 .section-libro p {
