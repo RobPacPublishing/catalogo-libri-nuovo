@@ -28,7 +28,7 @@ header {
 }
 
 #logo-catalogo {
-    max-height: 200px; /* Ingrandisce il logo del 200% */
+    max-height: 200px;
 }
 
 #banner-catalogo {
@@ -128,4 +128,35 @@ footer {
 
 .section-libro p b {
     font-size: 12px;
+}
+
+/* Media query per dispositivi mobili */
+@media (max-width: 768px) {
+    #logo-catalogo {
+        max-height: 100px; /* Riduce la dimensione del logo sui dispositivi mobili */
+    }
+
+    #banner-catalogo {
+        max-height: 200px; /* Riduce la dimensione del banner sui dispositivi mobili */
+    }
+
+    #libri {
+        grid-template-columns: repeat(auto-fit, 80px); /* Riduce la dimensione delle immagini dei libri sui dispositivi mobili */
+    }
+
+    .section-libro img {
+        width: 80px;
+        height: 120px;
+    }
+
+    .info-libro {
+        flex-direction: column; /* Cambia la direzione del flex a colonna sui dispositivi mobili */
+        width: 100%; /* Occupa l'intera larghezza dello schermo sui dispositivi mobili */
+    }
+
+    .info-libro img {
+        width: 100%; /* Occupa l'intera larghezza dello schermo sui dispositivi mobili */
+        margin-right: 0; /* Rimuove il margine destro sui dispositivi mobili */
+        margin-bottom: 20px; /* Aggiunge un margine inferiore sui dispositivi mobili */
+    }
 }
