@@ -119,9 +119,15 @@ libroForm.addEventListener("submit", async function(event) {
         return mostraNotifica("⚠️ Tutti i campi devono essere compilati!", "errore");
     }
     firebase.database().ref("libri").orderByChild("linkAmazon").equalTo(linkAmazon).once("value", async snapshot => {
-        if (snapshot.exists()) {
-            return mostraNotifica("⚠️ Questo libro è già stato inserito nel catalogo!", "errore");
-        }
+    console.log("🔍 Controllo doppioni eseguito. Trovati risultati:", snapshot.val()); // <-- Debug
+    
+    if (snapshot.exists() && Object.values(snapshot.val()).some(libro => libro.linkAmazon === linkAmazon)) {
+        console.log("⚠️ Libro doppione rilevato!");
+        return mostraNotifica("⚠️ Questo libro è già stato inserito!", "errore");
+    } else {
+        console.log("✅ Nessun doppione rilevato.");
+    }
+
 
         let urlImmagine = "placeholder.jpg";
         if (immagine) {
