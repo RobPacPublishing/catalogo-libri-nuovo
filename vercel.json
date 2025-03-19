@@ -1,5 +1,11 @@
 {
   "routes": [
-    { "src": "/admin", "dest": "/admin.html" }
+    { "src": "/admin", "dest": "/public/admin.html" },
+    { "src": "/admin.html", "dest": "/public/admin.html" },
+    { "src": "/admin.js", "dest": "/public/admin.js" },
+    { "src": "/admin.css", "dest": "/public/admin.css" },
+    { "src": "/(.*)", "dest": "/public/$1" }
+    { "src": "/favicon.ico", "dest": "/public/favicon.ico" }
+
   ]
 }
