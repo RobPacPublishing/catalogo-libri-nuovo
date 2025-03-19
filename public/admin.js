@@ -121,8 +121,7 @@ libroForm.addEventListener("submit", async function(event) {
     firebase.database().ref("libri").orderByChild("linkAmazon").equalTo(linkAmazon).once("value", async snapshot => {
     console.log("🔍 Controllo doppioni eseguito. Trovati risultati:", snapshot.val()); // <-- Debug
     
-    if (snapshot.exists() && Object.values(snapshot.val()).some(libro => libro.linkAmazon === linkAmazon)) {
-    console.log("⚠️ Libro doppione rilevato!");
+if (snapshot.exists() && Object.values(snapshot.val()).some(libro => libro.linkAmazon === linkAmazon)) {
     mostraNotifica("⚠️ Questo libro è già stato inserito!", "errore");
     libroForm.reset(); // Resetta i campi del form
     return; // Blocca l'esecuzione
