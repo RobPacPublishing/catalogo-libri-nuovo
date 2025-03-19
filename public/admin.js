@@ -1,12 +1,12 @@
 // CONFIGURAZIONE FIREBASE (Assicurati di sostituire con le tue credenziali!)
 const firebaseConfig = {
-    apiKey: "TUO_API_KEY",
-    authDomain: "TUO_AUTH_DOMAIN",
-    databaseURL: "TUO_DATABASE_URL",
-    projectId: "TUO_PROJECT_ID",
-    storageBucket: "TUO_STORAGE_BUCKET",
-    messagingSenderId: "TUO_MESSAGING_SENDER_ID",
-    appId: "TUO_APP_ID"
+    apiKey: "AIzaSyAOIp2reVVoeikYjZUk73yQpZNPaDVvCkw",
+    authDomain: "aggiungilibri.firebaseapp.com",
+    databaseURL: "https://aggiungilibri-default-rtdb.firebaseio.com",
+    projectId: "aggiungilibri",
+    storageBucket: "aggiungilibri.firebasestorage.app",
+    messagingSenderId: "215130413037",
+    appId: "1:215130413037:web:058d3395ddef3b7441f9e4"
 };
 
 // INIZIALIZZAZIONE FIREBASE
@@ -24,6 +24,8 @@ const loginContainer = document.getElementById("login-container");
 const adminPanel = document.getElementById("admin-panel");
 const libroForm = document.getElementById("libro-form");
 const libriInseriti = document.getElementById("libri-inseriti");
+const filtroTesto = document.getElementById("filtro-testo");
+const ordinamento = document.getElementById("ordinamento");
 
 // CACHE LOCALE
 let cacheLibri = [];
@@ -55,6 +57,7 @@ firebase.auth().onAuthStateChanged(user => {
 });
 
 // LOGIN CON GOOGLE
+// LOGIN CON GOOGLE
 loginButton.addEventListener("click", () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
@@ -64,6 +67,7 @@ loginButton.addEventListener("click", () => {
         })
         .catch(error => mostraNotifica("Errore di autenticazione: " + error.message, "errore"));
 });
+
 
 // LOGOUT
 logoutButton.addEventListener("click", () => {
