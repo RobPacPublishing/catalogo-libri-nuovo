@@ -31,16 +31,24 @@ const ordinamento = document.getElementById("ordinamento");
 let cacheLibri = [];
 
 // NOTIFICHE
+// NOTIFICHE
 const notifica = document.createElement("div");
 notifica.id = "notifica";
 document.body.appendChild(notifica);
 
 function mostraNotifica(testo, tipo = "successo") {
+    const notifica = document.getElementById("notifica");
+    if (!notifica) return;
+
     notifica.textContent = testo;
     notifica.className = tipo === "errore" ? "notifica-errore" : "notifica-successo";
     notifica.style.display = "block";
-    setTimeout(() => { notifica.style.display = "none"; }, 5000);
+
+    setTimeout(() => { 
+        notifica.style.display = "none"; 
+    }, 5000);
 }
+
 
 // CONTROLLO ACCESSO AMMINISTRATORI
 firebase.auth().onAuthStateChanged(user => {
