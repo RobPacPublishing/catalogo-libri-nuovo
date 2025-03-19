@@ -118,7 +118,67 @@ main {
     background: #0056b3;
 }
 
-/* LIBRI INSERITI */
+/* GRIGLIA LIBRI UTENTE */
+#libri {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Adatta automaticamente la larghezza */
+    gap: 20px;
+    padding: 20px;
+    justify-content: center;
+}
+
+/* BOX LIBRO UTENTE */
+.libro {
+    background: white;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 230px;
+}
+
+.libro img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.libro h3 {
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    word-wrap: break-word;
+    width: 90%;
+}
+
+.libro p {
+    font-size: 0.9rem;
+    color: #555;
+    margin: 5px 0;
+}
+
+.libro button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 10px;
+}
+
+.libro button:hover {
+    background: #0056b3;
+}
+
+/* LIBRI INSERITI ADMIN */
 #libri-inseriti {
     margin-top: 20px;
     display: flex;
@@ -143,7 +203,7 @@ main {
     object-fit: cover;
 }
 
-/* PULSANTE ELIMINAZIONE LIBRI */
+/* PULSANTE ELIMINAZIONE LIBRI ADMIN */
 .admin-libro button {
     background: #ff4d4d;
     color: white;
@@ -159,9 +219,9 @@ main {
     background: #cc0000;
 }
 
-/* REGOLA AGGIUNTA: Riduzione dimensione immagine grande in basso */
+/* RIDUZIONE IMMAGINE GRANDE IN BASSO */
 #libri img {
-    max-width: 120px; /* Ridotto rispetto all'originale */
+    max-width: 120px;
     height: auto;
     object-fit: cover;
 }
@@ -185,8 +245,20 @@ footer {
     }
 
     #libri {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Adatta la larghezza */
         gap: 10px;
+    }
+
+    .libro {
+        max-width: 180px;
+    }
+
+    .libro img {
+        max-width: 100%;
+    }
+
+    .libro h3 {
+        font-size: 0.9rem;
     }
 
     .section-libro img {
