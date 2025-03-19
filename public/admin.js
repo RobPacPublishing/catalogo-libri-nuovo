@@ -118,11 +118,10 @@ libroForm.addEventListener("submit", async function(event) {
     if (!titolo || !autore || !descrizione || !linkAmazon || isNaN(prezzo)) {
         return mostraNotifica("⚠️ Tutti i campi devono essere compilati!", "errore");
     }
-
     firebase.database().ref("libri").orderByChild("linkAmazon").equalTo(linkAmazon).once("value", async snapshot => {
-    if (snapshot.exists()) {
-        return mostraNotifica("⚠️ Questo libro è già stato inserito!", "errore");
-    }
+        if (snapshot.exists()) {
+            return mostraNotifica("⚠️ Questo libro è già stato inserito nel catalogo!", "errore");
+        }
 
         let urlImmagine = "placeholder.jpg";
         if (immagine) {
@@ -137,10 +136,13 @@ libroForm.addEventListener("submit", async function(event) {
             cacheLibri.push(libro);
             mostraLibriInseriti();
             mostraNotifica("📚 Libro aggiunto con successo!", "successo");
+
+            // Azzera i campi dopo l'inserimento riuscito
             libroForm.reset();
         }).catch(error => mostraNotifica("Errore durante l'aggiunta del libro: " + error.message, "errore"));
     });
 });
+
 
 // MOSTRA LIBRI INSERITI SOLO NEL LATO ADMIN
 function mostraLibriInseriti() {
