@@ -1,10 +1,12 @@
 {
-  "routes": [
-    { "src": "/admin", "dest": "/public/admin.html" },
-    { "src": "/admin.html", "dest": "/public/admin.html" },
-    { "src": "/admin.js", "dest": "/public/admin.js" },
-    { "src": "/admin.css", "dest": "/public/admin.css" },
-    { "src": "/favicon.ico", "dest": "/public/favicon.ico" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/admin", "destination": "/public/admin.html" },
+    { "source": "/admin.html", "destination": "/public/admin.html" },
+    { "source": "/admin.js", "destination": "/public/admin.js" },
+    { "source": "/admin.css", "destination": "/public/admin.css" },
+    { "source": "/favicon.ico", "destination": "/public/favicon.ico" }
+  ],
+  "redirects": [
+    { "source": "/", "destination": "/index.html", "statusCode": 200 }
   ]
 }
