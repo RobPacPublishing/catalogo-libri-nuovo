@@ -5,6 +5,6 @@
     { "src": "/admin.js", "dest": "/public/admin.js" },
     { "src": "/admin.css", "dest": "/public/admin.css" },
     { "src": "/favicon.ico", "dest": "/public/favicon.ico" },
-    { "src": "/", "dest": "/index.html" }
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
