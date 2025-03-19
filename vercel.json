@@ -6,6 +6,6 @@
     { "src": "/admin.html", "dest": "/public/admin.html" },
     { "src": "/admin.js", "dest": "/public/admin.js" },
     { "src": "/admin.css", "dest": "/public/admin.css" },
-    { "src": "/", "dest": "/index.html" }
+    { "src": "/(.*)", "dest": "/public/$1" }
   ]
 }
