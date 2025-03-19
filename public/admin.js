@@ -122,12 +122,11 @@ libroForm.addEventListener("submit", async function(event) {
     console.log("🔍 Controllo doppioni eseguito. Trovati risultati:", snapshot.val()); // <-- Debug
     
     if (snapshot.exists() && Object.values(snapshot.val()).some(libro => libro.linkAmazon === linkAmazon)) {
-        console.log("⚠️ Libro doppione rilevato!");
-        return mostraNotifica("⚠️ Questo libro è già stato inserito!", "errore");
-    } else {
-        console.log("✅ Nessun doppione rilevato.");
-    }
-
+    console.log("⚠️ Libro doppione rilevato!");
+    mostraNotifica("⚠️ Questo libro è già stato inserito!", "errore");
+    libroForm.reset(); // Resetta i campi del form
+    return; // Blocca l'esecuzione
+}
 
         let urlImmagine = "placeholder.jpg";
         if (immagine) {
