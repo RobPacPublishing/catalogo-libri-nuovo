@@ -31,21 +31,28 @@ const ordinamento = document.getElementById("ordinamento");
 let cacheLibri = [];
 
 // NOTIFICHE
-// NOTIFICHE
 const notifica = document.createElement("div");
 notifica.id = "notifica";
 document.body.appendChild(notifica);
 
 function mostraNotifica(testo, tipo = "successo") {
     const notifica = document.getElementById("notifica");
-    if (!notifica) return;
+    if (!notifica) {
+        console.error("⚠️ Errore: l'elemento #notifica non è stato trovato nel DOM.");
+        return;
+    }
 
     notifica.textContent = testo;
     notifica.className = tipo === "errore" ? "notifica-errore" : "notifica-successo";
-    notifica.style.display = "block";
 
-    setTimeout(() => { 
-        notifica.style.display = "none"; 
+    // Forza il rendering per garantire che appaia correttamente
+    notifica.style.display = "block";
+    notifica.style.opacity = "1";
+
+    // Nasconde la notifica dopo 5 secondi con un'animazione di dissolvenza
+    setTimeout(() => {
+        notifica.style.opacity = "0";
+        setTimeout(() => { notifica.style.display = "none"; }, 500); 
     }, 5000);
 }
 
