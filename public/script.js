@@ -11,7 +11,7 @@ const firebaseConfig = {
 
 // Inizializza Firebase
 if (!firebase.apps.length) {
-    console.log("Firebase SDK caricato?", typeof firebase !== "undefined");
+    console.log("Firebase SDK loaded?", typeof firebase !== "undefined");
     firebase.initializeApp(firebaseConfig);
 } else {
     firebase.app();
@@ -23,10 +23,10 @@ const infoContainer = document.getElementById("info-container");
 
 // Controllo se gli elementi HTML sono presenti
 if (!libriDiv) {
-    console.error("Errore: Elemento 'libri' non trovato in index.html.");
+    console.error("Error: 'libri' element not found in index.html.");
 }
 if (!infoContainer) {
-    console.error("Errore: Elemento 'info-container' non trovato in index.html.");
+    console.error("Error: 'info-container' element not found in index.html.");
 }
 
 // Funzione per mostrare i libri nel catalogo
@@ -48,17 +48,17 @@ function mostraLibri() {
                 immagine.classList.add("img-libro");
 
                 const titolo = document.createElement("h3");
-                titolo.textContent = libro.titolo || "Titolo non disponibile";
+                titolo.textContent = libro.titolo || "Title not available";
 
                 const autore = document.createElement("p");
-                autore.textContent = libro.autore ? "di " + libro.autore : "Autore sconosciuto";
+                autore.textContent = libro.autore ? "by " + libro.autore : "Unknown author";
 
                 const prezzo = document.createElement("p");
-                prezzo.innerHTML = libro.valuta && libro.prezzo ? `<b>${libro.valuta}${libro.prezzo}</b>` : "Prezzo non disponibile";
+                prezzo.innerHTML = libro.valuta && libro.prezzo ? `<b>from ${libro.valuta}${libro.prezzo}</b>` : "Price not available";
 
                 const buyButton = document.createElement("button");
                 buyButton.classList.add("buy-now-button");
-                buyButton.textContent = "Compra ora";
+                buyButton.textContent = "Buy now";
                 if (libro.linkAmazon) {
                     buyButton.addEventListener("click", () => {
                         window.open(libro.linkAmazon, "_blank");
@@ -81,10 +81,10 @@ function mostraLibri() {
                 libriDiv.appendChild(libroDiv);
             });
         } else {
-            libriDiv.innerHTML = "<p>Nessun libro disponibile.</p>";
+            libriDiv.innerHTML = "<p>No books available.</p>";
         }
     }).catch(error => {
-        console.error("Errore nel recupero dei libri:", error);
+        console.error("Error fetching books:", error);
     });
 }
 
@@ -111,23 +111,23 @@ function mostraInfoLibro(libroId) {
         immagine.alt = libro.titolo;
 
         const titolo = document.createElement("h3");
-        titolo.textContent = libro.titolo || "Titolo non disponibile";
+        titolo.textContent = libro.titolo || "Title not available";
 
         const autore = document.createElement("p");
-        autore.textContent = libro.autore ? "di " + libro.autore : "Autore sconosciuto";
+        autore.textContent = libro.autore ? "by " + libro.autore : "Unknown author";
 
         const descrizione = document.createElement("p");
-        descrizione.textContent = libro.descrizione || "Nessuna descrizione disponibile.";
+        descrizione.textContent = libro.descrizione || "No description available.";
 
         const prezzo = document.createElement("p");
-        prezzo.innerHTML = libro.valuta && libro.prezzo ? `<b>${libro.valuta}${libro.prezzo}</b>` : "Prezzo non disponibile";
+        prezzo.innerHTML = libro.valuta && libro.prezzo ? `<b>from ${libro.valuta}${libro.prezzo}</b>` : "Price not available";
 
         const formati = document.createElement("p");
-        formati.textContent = libro.formati ? "Formati disponibili: " + libro.formati.join(", ") : "N/A";
+        formati.textContent = libro.formati ? "Available formats: " + libro.formati.join(", ") : "N/A";
 
         const buyButton = document.createElement("button");
         buyButton.classList.add("buy-now-button");
-        buyButton.textContent = "Compra ora";
+        buyButton.textContent = "Buy now";
         if (libro.linkAmazon) {
             buyButton.addEventListener("click", () => {
                 window.open(libro.linkAmazon, "_blank");
@@ -150,7 +150,7 @@ function mostraInfoLibro(libroId) {
         infoContainer.innerHTML = "";
         infoContainer.appendChild(infoDiv);
     }).catch(error => {
-        console.error("Errore nel recupero delle informazioni del libro:", error);
+        console.error("Error fetching book details:", error);
     });
 }
 
@@ -173,3 +173,4 @@ function mostraBanner() {
 mostraLibri();
 mostraLogo();
 mostraBanner();
+
