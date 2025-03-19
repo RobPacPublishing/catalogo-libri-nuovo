@@ -1,54 +1,152 @@
+/* Stile generale */
 body {
-    font-family: sans-serif;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
 }
 
+/* Titoli */
+h1 {
+    color: #333;
+    font-size: 24px;
+}
+
+h2 {
+    color: #555;
+    margin-top: 30px;
+    font-size: 20px;
+}
+
+/* Contenitore del form */
 form {
-    width: 400px;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Etichette e input */
 label {
     display: block;
-    margin-bottom: 5px;
+    margin-top: 10px;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: left;
 }
 
 input[type="text"],
 input[type="url"],
 textarea,
-input[type="number"] {
+input[type="number"],
+input[type="file"],
+select {
     width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
+    padding: 6px; /* Ridotto da 10px per evitare sovrapposizioni */
+    margin-top: 5px;
     border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 13px; /* Ridotto da 14px */
 }
 
-button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-}
-
-#libri-inseriti {
+/* Correzione allineamento caselle di spunta */
+.formati-container {
     display: flex;
+    gap: 10px;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: center;
+    margin-top: 10px;
 }
 
+.formati-container label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+}
+
+/* Stile pulsanti */
+button {
+    width: 100%;
+    background-color: #28a745;
+    color: white;
+    padding: 12px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+/* Contenitore libri inseriti */
+#libri-inseriti {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Adatta il numero di colonne */
+    gap: 15px;
+    justify-content: center;
+}
+
+/* Box singolo per ogni libro */
 .admin-libro {
-    width: 100px;
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    padding: 5px;
+    width: 180px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
+    transition: transform 0.3s;
+}
+
+.admin-libro h3 {
+    font-size: 14px; /* Ridotto da 16px */
+}
+
+.admin-libro p {
+    font-size: 12px; /* Ridotto da 14px */
+}
+
+.admin-libro:hover {
+    transform: scale(1.05);
 }
 
 .admin-libro img {
     width: 100px;
     height: 150px;
     object-fit: cover;
+    border-radius: 5px;
 }
 
-.admin-libro h3 {
+/* Pulsante elimina libro */
+.admin-libro button {
+    width: auto;
+    padding: 8px 12px;
+    background-color: #dc3545;
+    border: none;
+    color: white;
     font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+.admin-libro button:hover {
+    background-color: #c82333;
+}
+
+/* Etichetta per il campo di upload della copertina */
+label[for="immagine"] {
+    display: block;
+    font-weight: bold;
+    margin-top: 10px;
+}
+

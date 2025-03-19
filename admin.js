@@ -1,108 +1,172 @@
+// CONFIGURAZIONE FIREBASE (Assicurati di sostituire con le tue credenziali!)
 const firebaseConfig = {
-    apiKey: "AIzaSyAOIp2reVVoeikYjZUk73yQpZNPaDVvCkw",
-    authDomain: "aggiungilibri.firebaseapp.com",
-    databaseURL: "https://aggiungilibri-default-rtdb.firebaseio.com",
-    projectId: "aggiungilibri",
-    storageBucket: "aggiungilibri.firebasestorage.app",
-    messagingSenderId: "215130413037",
-    appId: "1:215130413037:web:058d3395ddef3b7441f9e4"
+    apiKey: "TUO_API_KEY",
+    authDomain: "TUO_AUTH_DOMAIN",
+    databaseURL: "TUO_DATABASE_URL",
+    projectId: "TUO_PROJECT_ID",
+    storageBucket: "TUO_STORAGE_BUCKET",
+    messagingSenderId: "TUO_MESSAGING_SENDER_ID",
+    appId: "TUO_APP_ID"
 };
 
-firebase.initializeApp(firebaseConfig);
+// INIZIALIZZAZIONE FIREBASE
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 
+// LISTA AMMINISTRATORI AUTORIZZATI
+const amministratoriAutorizzati = ["robpacpublishing@gmail.com"];
+
+// ELEMENTI HTML
+const loginButton = document.getElementById("login-button");
+const logoutButton = document.getElementById("logout-button");
+const loginContainer = document.getElementById("login-container");
+const adminPanel = document.getElementById("admin-panel");
 const libroForm = document.getElementById("libro-form");
 const libriInseriti = document.getElementById("libri-inseriti");
-let libroDaModificare = null;
-const personalizzazioneForm = document.getElementById("personalizzazione-form");
 
-libroForm.addEventListener("submit", function(event) {
-    event.preventDefault();
+// CACHE LOCALE
+let cacheLibri = [];
 
-    const titolo = document.getElementById("titolo").value;
-    const autore = document.getElementById("autore").value;
-    const descrizione = document.getElementById("descrizione").value;
-    const linkAmazon = document.getElementById("linkAmazon").value;
-    let immagine = null;
-    if (document.getElementById("immagine").files[0]) {
-        immagine = document.getElementById("immagine").files[0];
-    }
-    const prezzo = document.getElementById("prezzo").value;
-    const valuta = document.getElementById("valuta").value;
-    const formati = [];
-    if (document.getElementById("ebook").checked) {
-        formati.push("eBook");
-    }
-    if (document.getElementById("paperback").checked) {
-        formati.push("Paperback");
-    }
-    if (document.getElementById("hardcover").checked) {
-        formati.push("Hardcover");
-    }
+// NOTIFICHE
+const notifica = document.createElement("div");
+notifica.id = "notifica";
+document.body.appendChild(notifica);
 
-    const libro = {
-        titolo: titolo,
-        autore: autore,
-        descrizione: descrizione,
-        linkAmazon: linkAmazon,
-        prezzo: prezzo,
-        valuta: valuta,
-        formati: formati,
-    };
+function mostraNotifica(testo, tipo = "successo") {
+    notifica.textContent = testo;
+    notifica.className = tipo === "errore" ? "notifica-errore" : "notifica-successo";
+    notifica.style.display = "block";
+    setTimeout(() => { notifica.style.display = "none"; }, 5000);
+}
 
-    if (immagine) {
-        const reader = new FileReader();
-
-        reader.onload = function(event) {
-            const immagineBase64 = event.target.result;
-            libro.immagine = immagineBase64;
-
-            aggiungiLibroAlFile(libro); // Aggiungi il libro indipendentemente dalla modifica
-
-            mostraLibriInseriti();
-            libroForm.reset();
-        };
-
-        reader.readAsDataURL(immagine);
+// CONTROLLO ACCESSO AMMINISTRATORI
+firebase.auth().onAuthStateChanged(user => {
+    if (user && amministratoriAutorizzati.includes(user.email)) {
+        loginContainer.style.display = "none";
+        adminPanel.style.display = "block";
+        caricaLibri();
     } else {
-        aggiungiLibroAlFile(libro); // Aggiungi il libro indipendentemente dalla modifica
-
-        mostraLibriInseriti();
-        libroForm.reset();
+        loginContainer.style.display = "block";
+        adminPanel.style.display = "none";
+        mostraNotifica("⚠️ Accesso negato o utente non autenticato!", "errore");
+        firebase.auth().signOut();
     }
 });
 
-function aggiungiLibroAlFile(libro) {
-    const libriRef = firebase.database().ref('libri');
-    libriRef.push(libro)
-        .then(() => {
-            mostraLibriInseriti();
+// LOGIN CON GOOGLE
+loginButton.addEventListener("click", () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider)
+        .then(result => {
+            mostraNotifica(`Benvenuto ${result.user.displayName}!`, "successo");
+            setTimeout(() => { location.reload(); }, 1000);
         })
-        .catch((error) => {
-            console.error("Errore durante l'aggiunta del libro:", error);
-        });
+        .catch(error => mostraNotifica("Errore di autenticazione: " + error.message, "errore"));
+});
+
+// LOGOUT
+logoutButton.addEventListener("click", () => {
+    firebase.auth().signOut().then(() => {
+        mostraNotifica("Logout effettuato con successo!", "successo");
+        location.reload();
+    }).catch(error => mostraNotifica("Errore nel logout", "errore"));
+});
+
+// CARICAMENTO LIBRI
+function caricaLibri() {
+    firebase.database().ref('libri').once('value').then(snapshot => {
+        cacheLibri = snapshot.val() ? Object.entries(snapshot.val()).map(([id, libro]) => ({ id, ...libro })) : [];
+        libriInseriti.innerHTML = "";
+        mostraLibriInseriti();
+    }).catch(error => mostraNotifica("Errore nel caricamento dei libri: " + error.message, "errore"));
 }
 
-function mostraLibriInseriti() {
-    const libriRef = firebase.database().ref('libri');
-    libriRef.on('value', (snapshot) => {
-        const libri = snapshot.val();
-        libriInseriti.innerHTML = "";
+// FUNZIONE UPLOAD CLOUDINARY
+async function uploadImmagine(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "robpac_upload");
+    formData.append("folder", "copertine");
 
-        if (libri) {
-            Object.values(libri).forEach((libro) => {
-                const libroDiv = document.createElement("div");
-                libroDiv.innerHTML = `
-                    <h3>${libro.titolo}</h3>
-                    <p>${libro.autore}</p>
-                    <p>${libro.descrizione}</p>
-                    ${libro.immagine ? `<img src="${libro.immagine}" alt="${libro.titolo}" style="max-width: 100px;">` : ''}
-                `;
-                libriInseriti.appendChild(libroDiv);
-            });
+    try {
+        const response = await fetch("https://api.cloudinary.com/v1_1/robpac/image/upload", { method: "POST", body: formData });
+        if (!response.ok) throw new Error(`Errore nell'upload: ${response.statusText}`);
+        const data = await response.json();
+        return data.secure_url;
+    } catch (error) {
+        return null;
+    }
+}
+
+// INSERIMENTO NUOVO LIBRO
+libroForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const titolo = document.getElementById("titolo").value.trim();
+    const autore = document.getElementById("autore").value.trim();
+    const descrizione = document.getElementById("descrizione").value.trim();
+    const linkAmazon = document.getElementById("linkAmazon").value.trim();
+    const immagine = document.getElementById("immagine").files[0];
+    const prezzo = parseFloat(document.getElementById("prezzo").value.replace(",", "."));
+    const valuta = document.getElementById("valuta").value;
+
+    if (!titolo || !autore || !descrizione || !linkAmazon || isNaN(prezzo)) {
+        return mostraNotifica("⚠️ Tutti i campi devono essere compilati!", "errore");
+    }
+
+    firebase.database().ref("libri").orderByChild("titolo").equalTo(titolo).once("value", async snapshot => {
+        if (snapshot.exists() && Object.values(snapshot.val()).some(libro => libro.autore.toLowerCase() === autore.toLowerCase())) {
+            return mostraNotifica("⚠️ Questo libro è già stato inserito!", "errore");
         }
+
+        let urlImmagine = "placeholder.jpg";
+        if (immagine) {
+            urlImmagine = await uploadImmagine(immagine);
+            if (!urlImmagine) return mostraNotifica("Errore nel caricamento immagine!", "errore");
+        }
+
+        const libro = { titolo, autore, descrizione, linkAmazon, prezzo: prezzo.toFixed(2), valuta, immagine: urlImmagine };
+        const libriRef = firebase.database().ref('libri').push();
+        libro.id = libriRef.key;
+        libriRef.set(libro).then(() => {
+            cacheLibri.push(libro);
+            mostraLibriInseriti();
+            mostraNotifica("📚 Libro aggiunto con successo!", "successo");
+            libroForm.reset();
+        }).catch(error => mostraNotifica("Errore durante l'aggiunta del libro: " + error.message, "errore"));
+    });
+});
+
+// MOSTRA LIBRI INSERITI SOLO NEL LATO ADMIN
+function mostraLibriInseriti() {
+    libriInseriti.innerHTML = "";
+    cacheLibri.forEach(libro => {
+        const div = document.createElement("div");
+        div.classList.add("admin-libro");
+        div.dataset.id = libro.id;
+        div.innerHTML = `
+            <h3>${libro.titolo}</h3>
+            <p>${libro.autore}</p>
+            <img src="${libro.immagine}" alt="${libro.titolo}" style="width:100px; height:150px;">
+            <button onclick="eliminaLibro('${libro.id}')">❌ Elimina</button>
+        `;
+        libriInseriti.appendChild(div);
     });
 }
 
-function modificaLibroInFile(libroDaModificare, libro) {
-    // ... (codice per modificare un libro esistente) ...
+// ELIMINA LIBRO
+function eliminaLibro(libroId) {
+    firebase.database().ref('libri/' + libroId).remove()
+        .then(() => {
+            cacheLibri = cacheLibri.filter(libro => libro.id !== libroId);
+            mostraLibriInseriti();
+            mostraNotifica("Libro eliminato con successo!", "successo");
+        })
+        .catch(error => mostraNotifica("Errore nell'eliminazione del libro: " + error.message, "errore"));
 }
+
+
+// EVENTI FILTRO E ORDINAMENTO
+if (filtroTesto) filtroTesto.addEventListener("input", mostraLibriInseriti);
+if (ordinamento) ordinamento.addEventListener("change", mostraLibriInseriti);
