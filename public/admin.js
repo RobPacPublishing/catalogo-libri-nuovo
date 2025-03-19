@@ -119,10 +119,10 @@ libroForm.addEventListener("submit", async function(event) {
         return mostraNotifica("⚠️ Tutti i campi devono essere compilati!", "errore");
     }
 
-    firebase.database().ref("libri").orderByChild("titolo").equalTo(titolo).once("value", async snapshot => {
-        if (snapshot.exists() && Object.values(snapshot.val()).some(libro => libro.autore.toLowerCase() === autore.toLowerCase())) {
-            return mostraNotifica("⚠️ Questo libro è già stato inserito!", "errore");
-        }
+    firebase.database().ref("libri").orderByChild("linkAmazon").equalTo(linkAmazon).once("value", async snapshot => {
+    if (snapshot.exists()) {
+        return mostraNotifica("⚠️ Questo libro è già stato inserito!", "errore");
+    }
 
         let urlImmagine = "placeholder.jpg";
         if (immagine) {
