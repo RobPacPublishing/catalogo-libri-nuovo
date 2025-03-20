@@ -147,33 +147,38 @@ footer {
     font-size: 14px;
 }
 
-/* POPUP MODAL - Formato Orizzontale */
+/* POPUP MODAL - Correzione visibilità e layout */
 #book-popup {
     display: none;
     position: fixed;
-    top: 10%;
+    top: 10vh; /* Spostato più in basso per non coprire il banner */
     left: 50%;
     transform: translateX(-50%);
-    width: 85%;
-    max-width: 900px;
-    background-color: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    background-color: rgba(0, 0, 0, 0.7); /* Sfondo più scuro per migliorare la separazione */
     padding: 20px;
-    text-align: left;
-    z-index: 999;
+    border-radius: 10px;
+    z-index: 1000;
+    backdrop-filter: blur(5px); /* Effetto sfocato dietro */
 }
 
 .popup-content {
+    background: white;
+    width: 100%;
+    max-width: 750px;
+    padding: 20px;
+    border-radius: 8px;
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     gap: 20px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.4);
 }
 
 .popup-content img {
-    width: 35%;
-    max-height: 250px;
+    width: 35%; /* Ridotta la dimensione per evitare che occupi troppo spazio */
+    max-height: 280px;
     object-fit: cover;
     border-radius: 5px;
 }
@@ -182,45 +187,71 @@ footer {
     width: 60%;
     padding: 10px;
     text-align: left;
+    overflow-y: auto;
+    max-height: 400px;
 }
 
-#popup-author {
-    margin-top: 10px;
+/* Nome autore sotto l'immagine */
+.popup-text h3 {
+    font-size: 18px;
+    margin-top: 5px;
+}
+
+.popup-text p {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+}
+
+.popup-text .author {
     font-weight: bold;
     text-align: center;
+    font-size: 16px;
+    margin-top: 5px;
 }
 
-/* CHIUSURA POPUP */
+/* Buy Now Button migliorato */
+.popup-text .buy-now-button {
+    display: block;
+    width: 100%;
+    background-color: #ff9900;
+    color: white;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.popup-text .buy-now-button:hover {
+    background-color: #e68900;
+}
+
+/* CHIUSURA POPUP - Resa più visibile */
 .close-popup {
     position: absolute;
-    top: 10px;
+    top: 5px;
     right: 15px;
-    font-size: 24px;
+    font-size: 22px;
     cursor: pointer;
-    color: black;
-    background-color: rgba(255, 255, 255, 0.7);
+    color: white;
+    background-color: rgba(0, 0, 0, 0.8);
     padding: 5px 10px;
     border-radius: 5px;
 }
 
 .close-popup:hover {
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: black;
 }
 
-/* RESPONSIVE DESIGN */
+/* Responsive per mobile */
 @media (max-width: 768px) {
-    #titolo-container {
-        font-size: 14px;
-    }
-    
-    #logo-catalogo {
-        max-width: 90px;
-    }
-
     #book-popup {
         width: 95%;
-        top: 5%;
+        top: 5vh;
     }
 
     .popup-content {

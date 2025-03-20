@@ -27,6 +27,13 @@ const popupPrice = document.getElementById("popup-price");
 const popupBuyNow = document.getElementById("popup-buy-now");
 const closePopup = document.querySelector(".close-popup");
 
+// Traduzione in inglese per il catalogo libri
+const TEXTS = {
+    buyNow: "Buy Now",
+    author: "by",
+    priceFrom: "from "
+};
+
 // Funzione per mostrare i libri nel catalogo
 function mostraLibri() {
     const libriRef = firebase.database().ref("libri");
@@ -38,7 +45,7 @@ function mostraLibri() {
             Object.entries(libri).forEach(([id, libro]) => {
                 const libroDiv = document.createElement("div");
                 libroDiv.classList.add("section-libro");
-
+                
                 const immagine = document.createElement("img");
                 immagine.src = libro.immagine || "placeholder.jpg";
                 immagine.alt = libro.titolo;
@@ -48,14 +55,14 @@ function mostraLibri() {
                 titolo.textContent = libro.titolo || "Title not available";
 
                 const autore = document.createElement("p");
-                autore.textContent = libro.autore ? `by ${libro.autore}` : "Unknown author";
+                autore.textContent = libro.autore ? `${TEXTS.author} ${libro.autore}` : "Unknown author";
 
                 const prezzo = document.createElement("p");
-                prezzo.innerHTML = libro.valuta && libro.prezzo ? `<b>from ${libro.valuta}${libro.prezzo}</b>` : "Price not available";
+                prezzo.innerHTML = libro.valuta && libro.prezzo ? `<b>${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}</b>` : "Price not available";
 
                 const buyButton = document.createElement("button");
                 buyButton.classList.add("buy-now-button");
-                buyButton.textContent = "Buy Now";
+                buyButton.textContent = TEXTS.buyNow;
                 if (libro.linkAmazon) {
                     buyButton.addEventListener("click", () => {
                         window.open(libro.linkAmazon, "_blank");
@@ -89,14 +96,21 @@ function mostraInfoLibro(libroId) {
 
         popupImage.src = libro.immagine || "placeholder.jpg";
         popupImage.alt = libro.titolo;
+        popupAuthor.textContent = libro.autore ? `${TEXTS.author} ${libro.autore}` : "Unknown author";
         popupTitle.textContent = libro.titolo || "Title not available";
-        popupAuthor.textContent = libro.autore ? `by ${libro.autore}` : "Unknown author";
         popupDescription.textContent = libro.descrizione || "No description available.";
-
+        
         if (libro.valuta && libro.prezzo) {
-            popupPrice.innerHTML = `<b>from ${libro.valuta}${libro.prezzo}</b>`;
+            popupPrice.innerHTML = `<b>${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}</b>`;
         } else {
             popupPrice.innerHTML = "";
+        }
+
+        if (libro.linkAmazon) {
+            popupBuyNow.style.display = "block";
+            popupBuyNow.onclick = () => window.open(libro.linkAmazon, "_blank");
+        } else {
+            popupBuyNow.style.display = "none";
         }
 
         popupContainer.style.display = "flex";
