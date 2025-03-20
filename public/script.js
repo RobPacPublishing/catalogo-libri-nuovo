@@ -1,4 +1,3 @@
-
 // Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAOIp2reVVoeikYjZUk73yQpZNPaDVvCkw",
@@ -110,7 +109,14 @@ function mostraInfoLibro(libroId) {
         popupTitle.textContent = libro.titolo || "Title not available";
         popupAuthor.textContent = libro.autore ? "by " + libro.autore : "Unknown author";
         popupDescription.textContent = libro.descrizione || "No description available.";
-        popupFormats.textContent = libro.formati ? "Available formats: " + libro.formati.join(", ") : "N/A";
+
+        // ✅ FIXED: Ensure "Available formats" is shown correctly
+        if (libro.formati && Array.isArray(libro.formati) && libro.formati.length > 0) {
+            popupFormats.textContent = "Available formats: " + libro.formati.join(", ");
+        } else {
+            popupFormats.textContent = "Format not specified";
+        }
+
         popupPrice.innerHTML = libro.valuta && libro.prezzo ? `<b>from ${libro.valuta}${libro.prezzo}</b>` : "Price not available";
 
         if (libro.linkAmazon) {

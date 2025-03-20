@@ -1,4 +1,4 @@
-// CONFIGURAZIONE FIREBASE (Assicurati di sostituire con le tue credenziali!)
+// CONFIGURAZIONE FIREBASE
 const firebaseConfig = {
     apiKey: "AIzaSyAOIp2reVVoeikYjZUk73yQpZNPaDVvCkw",
     authDomain: "aggiungilibri.firebaseapp.com",
@@ -45,9 +45,11 @@ function mostraNotifica(testo, tipo = "successo") {
     notifica.textContent = testo;
     notifica.className = tipo === "errore" ? "notifica-errore" : "notifica-successo";
 
+    // Forza il rendering per garantire che appaia correttamente
     notifica.style.display = "block";
     notifica.style.opacity = "1";
 
+    // Nasconde la notifica dopo 5 secondi con un'animazione di dissolvenza
     setTimeout(() => {
         notifica.style.opacity = "0";
         setTimeout(() => { notifica.style.display = "none"; }, 500); 
@@ -113,7 +115,7 @@ async function uploadImmagine(file) {
     }
 }
 
-// INSERIMENTO NUOVO LIBRO (Con formati)
+// INSERIMENTO NUOVO LIBRO
 libroForm.addEventListener("submit", async function(event) {
     event.preventDefault();
 
@@ -124,37 +126,27 @@ libroForm.addEventListener("submit", async function(event) {
     const immagine = document.getElementById("immagine").files[0];
     const prezzo = parseFloat(document.getElementById("prezzo").value.replace(",", "."));
     const valuta = document.getElementById("valuta").value;
-
-    // Recupero formati selezionati
-    const formatiSelezionati = [...document.querySelectorAll('input[name="formati"]:checked')].map(el => el.value);
+    const formati = Array.from(document.querySelectorAll(".formato-checkbox:checked")).map(cb => cb.value);
 
     if (!titolo || !autore || !descrizione || !linkAmazon || isNaN(prezzo)) {
         return mostraNotifica("⚠️ Tutti i campi devono essere compilati!", "errore");
     }
 
-    firebase.database().ref("libri").orderByChild("linkAmazon").equalTo(linkAmazon).once("value", async snapshot => {
-        if (snapshot.exists()) {
-            mostraNotifica("⚠️ Questo libro è già stato inserito!", "errore");
-            libroForm.reset();
-            return;
-        }
+    let urlImmagine = "placeholder.jpg";
+    if (immagine) {
+        urlImmagine = await uploadImmagine(immagine);
+        if (!urlImmagine) return mostraNotifica("Errore nel caricamento immagine!", "errore");
+    }
 
-        let urlImmagine = "placeholder.jpg";
-        if (immagine) {
-            urlImmagine = await uploadImmagine(immagine);
-            if (!urlImmagine) return mostraNotifica("Errore nel caricamento immagine!", "errore");
-        }
-
-        const libro = { titolo, autore, descrizione, linkAmazon, prezzo: prezzo.toFixed(2), valuta, immagine: urlImmagine, formati: formatiSelezionati };
-        const libriRef = firebase.database().ref('libri').push();
-        libro.id = libriRef.key;
-        libriRef.set(libro).then(() => {
-            cacheLibri.push(libro);
-            mostraLibriInseriti();
-            mostraNotifica("📚 Libro aggiunto con successo!", "successo");
-            libroForm.reset();
-        }).catch(error => mostraNotifica("Errore durante l'aggiunta del libro: " + error.message, "errore"));
-    });
+    const libro = { titolo, autore, descrizione, linkAmazon, prezzo: prezzo.toFixed(2), valuta, immagine: urlImmagine, formati };
+    const libriRef = firebase.database().ref('libri').push();
+    libro.id = libriRef.key;
+    libriRef.set(libro).then(() => {
+        cacheLibri.push(libro);
+        mostraLibriInseriti();
+        mostraNotifica("📚 Libro aggiunto con successo!", "successo");
+        libroForm.reset();
+    }).catch(error => mostraNotifica("Errore durante l'aggiunta del libro: " + error.message, "errore"));
 });
 
 // MOSTRA LIBRI INSERITI SOLO NEL LATO ADMIN
@@ -167,8 +159,9 @@ function mostraLibriInseriti() {
         div.innerHTML = `
             <h3>${libro.titolo}</h3>
             <p>${libro.autore}</p>
+            <p><strong>Formats:</strong> ${libro.formati ? libro.formati.join(", ") : "N/A"}</p>
             <img src="${libro.immagine}" alt="${libro.titolo}" style="width:100px; height:150px;">
-            <button onclick="eliminaLibro('${libro.id}')">❌ Elimina</button>
+            <button onclick="eliminaLibro('${libro.id}')">❌ Delete</button>
         `;
         libriInseriti.appendChild(div);
     });
