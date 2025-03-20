@@ -45,17 +45,14 @@ function mostraNotifica(testo, tipo = "successo") {
     notifica.textContent = testo;
     notifica.className = tipo === "errore" ? "notifica-errore" : "notifica-successo";
 
-    // Forza il rendering per garantire che appaia correttamente
     notifica.style.display = "block";
     notifica.style.opacity = "1";
 
-    // Nasconde la notifica dopo 5 secondi con un'animazione di dissolvenza
     setTimeout(() => {
         notifica.style.opacity = "0";
         setTimeout(() => { notifica.style.display = "none"; }, 500); 
     }, 5000);
 }
-
 
 // CONTROLLO ACCESSO AMMINISTRATORI
 firebase.auth().onAuthStateChanged(user => {
@@ -72,7 +69,6 @@ firebase.auth().onAuthStateChanged(user => {
 });
 
 // LOGIN CON GOOGLE
-// LOGIN CON GOOGLE
 loginButton.addEventListener("click", () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
@@ -82,7 +78,6 @@ loginButton.addEventListener("click", () => {
         })
         .catch(error => mostraNotifica("Errore di autenticazione: " + error.message, "errore"));
 });
-
 
 // LOGOUT
 logoutButton.addEventListener("click", () => {
@@ -118,7 +113,7 @@ async function uploadImmagine(file) {
     }
 }
 
-// INSERIMENTO NUOVO LIBRO
+// INSERIMENTO NUOVO LIBRO (Con formati)
 libroForm.addEventListener("submit", async function(event) {
     event.preventDefault();
 
@@ -130,17 +125,19 @@ libroForm.addEventListener("submit", async function(event) {
     const prezzo = parseFloat(document.getElementById("prezzo").value.replace(",", "."));
     const valuta = document.getElementById("valuta").value;
 
+    // Recupero formati selezionati
+    const formatiSelezionati = [...document.querySelectorAll('input[name="formati"]:checked')].map(el => el.value);
+
     if (!titolo || !autore || !descrizione || !linkAmazon || isNaN(prezzo)) {
         return mostraNotifica("⚠️ Tutti i campi devono essere compilati!", "errore");
     }
+
     firebase.database().ref("libri").orderByChild("linkAmazon").equalTo(linkAmazon).once("value", async snapshot => {
-    console.log("🔍 Controllo doppioni eseguito. Trovati risultati:", snapshot.val()); // <-- Debug
-    
-if (snapshot.exists() && Object.values(snapshot.val()).some(libro => libro.linkAmazon === linkAmazon)) {
-    mostraNotifica("⚠️ Questo libro è già stato inserito!", "errore");
-    libroForm.reset(); // Resetta i campi del form
-    return; // Blocca l'esecuzione
-}
+        if (snapshot.exists()) {
+            mostraNotifica("⚠️ Questo libro è già stato inserito!", "errore");
+            libroForm.reset();
+            return;
+        }
 
         let urlImmagine = "placeholder.jpg";
         if (immagine) {
@@ -148,20 +145,17 @@ if (snapshot.exists() && Object.values(snapshot.val()).some(libro => libro.linkA
             if (!urlImmagine) return mostraNotifica("Errore nel caricamento immagine!", "errore");
         }
 
-        const libro = { titolo, autore, descrizione, linkAmazon, prezzo: prezzo.toFixed(2), valuta, immagine: urlImmagine };
+        const libro = { titolo, autore, descrizione, linkAmazon, prezzo: prezzo.toFixed(2), valuta, immagine: urlImmagine, formati: formatiSelezionati };
         const libriRef = firebase.database().ref('libri').push();
         libro.id = libriRef.key;
         libriRef.set(libro).then(() => {
             cacheLibri.push(libro);
             mostraLibriInseriti();
             mostraNotifica("📚 Libro aggiunto con successo!", "successo");
-
-            // Azzera i campi dopo l'inserimento riuscito
             libroForm.reset();
         }).catch(error => mostraNotifica("Errore durante l'aggiunta del libro: " + error.message, "errore"));
     });
 });
-
 
 // MOSTRA LIBRI INSERITI SOLO NEL LATO ADMIN
 function mostraLibriInseriti() {
@@ -190,7 +184,6 @@ function eliminaLibro(libroId) {
         })
         .catch(error => mostraNotifica("Errore nell'eliminazione del libro: " + error.message, "errore"));
 }
-
 
 // EVENTI FILTRO E ORDINAMENTO
 if (filtroTesto) filtroTesto.addEventListener("input", mostraLibriInseriti);
