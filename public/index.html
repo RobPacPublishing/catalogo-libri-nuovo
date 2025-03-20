@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalogo Libri</title>
+    <title>Book Catalog</title>
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -13,25 +13,37 @@
             <h2>A World of Books at Your Fingertips</h2>
         </div>
         <div id="logo-container">
-            <img id="logo-catalogo" src="/logo3senzasfondo.png" alt="Logo Catalogo">
+            <img id="logo-catalogo" src="/logo3senzasfondo.png" alt="Catalog Logo">
         </div>
-        <img id="banner-catalogo" src="/banner-landpage2.png" alt="Banner Catalogo">
+        <img id="banner-catalogo" src="/banner-landpage2.png" alt="Catalog Banner">
     </header>
 
     <main>
         <h2>Book Catalog</h2>
         
-        <!-- 🔹 Campo di ricerca per filtrare i libri -->
+        <!-- 🔹 Search bar for filtering books -->
         <input type="text" id="filtro-testo" placeholder="Search books...">
         
         <div id="libri"></div>
-    <div id="info-container"></div>
-
     </main>
 
     <footer>
         <p>&copy; 2025 Rob Pac - All Rights Reserved</p>
     </footer>
+
+    <!-- 🔹 Popup Modal for Book Details -->
+    <div id="book-popup" class="popup-container">
+        <div class="popup-content">
+            <span class="close-popup">&times;</span>
+            <img id="popup-image" src="" alt="Book Cover">
+            <h3 id="popup-title"></h3>
+            <p id="popup-author"></p>
+            <p id="popup-description"></p>
+            <p id="popup-formats"></p>
+            <p id="popup-price"></p>
+            <button id="popup-buy-now" class="buy-now-button">Buy Now</button>
+        </div>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>

@@ -1,47 +1,63 @@
+/* General Styles */
 body {
-    font-family: sans-serif;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f0f8ff;
+    background-color: #f5f5f5;
 }
 
 /* HEADER */
 header {
-    background-color: #f0f0f0;
+    background-color: #fff;
     padding: 20px;
     text-align: center;
-    position: relative;
+    border-bottom: 2px solid #ddd;
 }
 
 #titolo-container {
-    position: absolute;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1;
+    text-align: center;
 }
 
 #logo-container {
-    position: absolute;
-    top: 50%;
-    left: 20px;
-    transform: translateY(-50%);
-    z-index: 1;
+    position: relative;
+    text-align: center;
+    margin-bottom: 10px;
 }
 
 #logo-catalogo {
-    max-height: 250px;
+    max-width: 150px;
+    display: block;
+    margin: 0 auto;
 }
 
 #banner-catalogo {
     width: 100%;
-    max-height: 300px;
+    max-height: 250px;
     object-fit: cover;
 }
 
-/* CONTENUTO PRINCIPALE */
+/* MAIN CONTENT */
 main {
+    max-width: 1100px;
+    margin: 20px auto;
     padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+h2 {
+    text-align: center;
+}
+
+/* SEARCH BAR */
+#filtro-testo {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
 /* FORM GESTIONE LIBRI */
@@ -64,17 +80,6 @@ main {
 
 #libro-form label {
     font-weight: bold;
-}
-
-#libro-form input,
-#libro-form textarea,
-#libro-form select,
-#libro-form button {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
 }
 
 /* LABEL CHIARA PER UPLOAD IMMAGINE */
@@ -118,67 +123,101 @@ main {
     background: #0056b3;
 }
 
-/* GRIGLIA LIBRI UTENTE */
+/* BOOK GRID */
 #libri {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* Adatta automaticamente la larghezza */
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
-    padding: 20px;
-    justify-content: center;
 }
 
-/* BOX LIBRO UTENTE */
-.libro {
-    background: white;
+/* BOOK CARD */
+.section-libro {
+    background-color: white;
     padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     text-align: center;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.section-libro:hover {
+    transform: scale(1.05);
+}
+
+.img-libro {
     width: 100%;
-    max-width: 230px;
-}
-
-.libro img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 5px;
+    max-height: 250px;
     object-fit: cover;
+    border-radius: 5px;
 }
 
-.libro h3 {
-    font-size: 1rem;
-    font-weight: bold;
-    text-align: center;
-    word-wrap: break-word;
-    width: 90%;
+.section-libro h3 {
+    font-size: 18px;
+    margin: 10px 0;
 }
 
-.libro p {
-    font-size: 0.9rem;
-    color: #555;
-    margin: 5px 0;
+.section-libro p {
+    font-size: 14px;
+    color: #666;
 }
 
-.libro button {
-    background: #007bff;
+/* BUY NOW BUTTON */
+.buy-now-button {
+    background-color: #ff9900;
     color: white;
     border: none;
-    padding: 8px 12px;
-    border-radius: 4px;
+    padding: 10px;
+    font-size: 16px;
     cursor: pointer;
-    font-size: 0.9rem;
+    border-radius: 5px;
+    width: 100%;
     margin-top: 10px;
 }
 
-.libro button:hover {
-    background: #0056b3;
+.buy-now-button:hover {
+    background-color: #e68900;
 }
 
-/* LIBRI INSERITI ADMIN */
+/* POPUP MODAL */
+#book-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-content {
+    background: white;
+    width: 80%;
+    max-width: 600px;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    position: relative;
+}
+
+.popup-content img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.close-popup {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* ADMIN BOOK LIST */
 #libri-inseriti {
     margin-top: 20px;
     display: flex;
@@ -203,7 +242,7 @@ main {
     object-fit: cover;
 }
 
-/* PULSANTE ELIMINAZIONE LIBRI ADMIN */
+/* DELETE BUTTON ADMIN */
 .admin-libro button {
     background: #ff4d4d;
     color: white;
@@ -230,11 +269,11 @@ main {
 footer {
     text-align: center;
     padding: 10px;
-    background: #f0f0f0;
-    font-size: 14px;
+    background: #222;
+    color: white;
 }
 
-/* ADATTAMENTO MOBILE */
+/* RESPONSIVE DESIGN */
 @media (max-width: 768px) {
     #logo-catalogo {
         max-height: 100px;
@@ -245,7 +284,7 @@ footer {
     }
 
     #libri {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* Adatta la larghezza */
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
         gap: 10px;
     }
 
