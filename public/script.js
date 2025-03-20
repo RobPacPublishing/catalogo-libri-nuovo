@@ -19,20 +19,6 @@ if (!firebase.apps.length) {
 // Selettori per gli elementi HTML
 const libriDiv = document.getElementById("libri");
 const popupContainer = document.getElementById("book-popup");
-const popupImage = document.getElementById("popup-image");
-const popupTitle = document.getElementById("popup-title");
-const popupAuthor = document.getElementById("popup-author");
-const popupDescription = document.getElementById("popup-description");
-const popupFormats = document.getElementById("popup-formats");
-const popupPrice = document.getElementById("popup-price");
-const popupBuyNow = document.getElementById("popup-buy-now");
-const closePopup = document.querySelector(".close-popup");
-
-// Allineamento contenuti delle miniature libri
-libriDiv.style.display = "grid";
-libriDiv.style.gridTemplateColumns = "repeat(auto-fill, minmax(250px, 1fr))";
-libriDiv.style.gap = "20px";
-libriDiv.style.textAlign = "center";
 
 // Traduzione in inglese per il catalogo libri
 const TEXTS = {
@@ -40,38 +26,6 @@ const TEXTS = {
     author: "by",
     priceFrom: "from "
 };
-
-// Assicurarsi che gli elementi richiesti esistano
-if (!libriDiv) {
-    console.error("Errore: elemento 'libri' non trovato in index.html.");
-}
-if (!popupContainer) {
-    console.error("Errore: elemento 'book-popup' non trovato in index.html.");
-}
-if (!popupImage) {
-    console.error("Errore: elemento 'popup-image' non trovato in index.html.");
-}
-if (!popupTitle) {
-    console.error("Errore: elemento 'popup-title' non trovato in index.html.");
-}
-if (!popupAuthor) {
-    console.error("Errore: elemento 'popup-author' non trovato in index.html.");
-}
-if (!popupDescription) {
-    console.error("Errore: elemento 'popup-description' non trovato in index.html.");
-}
-if (!popupFormats) {
-    console.error("Errore: elemento 'popup-formats' non trovato in index.html.");
-}
-if (!popupPrice) {
-    console.error("Errore: elemento 'popup-price' non trovato in index.html.");
-}
-if (!popupBuyNow) {
-    console.error("Errore: elemento 'popup-buy-now' non trovato in index.html.");
-}
-if (!closePopup) {
-    console.error("Errore: elemento 'close-popup' non trovato in index.html.");
-}
 
 // Funzione per mostrare i libri nel catalogo
 function mostraLibri() {
@@ -85,36 +39,18 @@ function mostraLibri() {
                 const libroDiv = document.createElement("div");
                 libroDiv.classList.add("section-libro");
 
-                const immagine = document.createElement("img");
-                immagine.src = libro.immagine || "placeholder.jpg";
-                immagine.alt = libro.titolo;
-                immagine.classList.add("img-libro");
+                libroDiv.innerHTML = `
+                    <div class="libro-top">
+                        <img class="img-libro" src="${libro.immagine || 'placeholder.jpg'}" alt="${libro.titolo}">
+                        <h3>${libro.titolo || 'Title not available'}</h3>
+                    </div>
+                    <div class="libro-bottom">
+                        <p>${libro.autore ? `${TEXTS.author} ${libro.autore}` : 'Unknown author'}</p>
+                        <p>${libro.valuta && libro.prezzo ? `<b>${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}</b>` : 'Price not available'}</p>
+                        <button class="buy-now-button" ${libro.linkAmazon ? `onclick="window.open('${libro.linkAmazon}', '_blank')"` : 'disabled'}>${TEXTS.buyNow}</button>
+                    </div>
+                `;
 
-                const titolo = document.createElement("h3");
-                titolo.textContent = libro.titolo || "Title not available";
-
-                const autore = document.createElement("p");
-                autore.textContent = libro.autore ? `${TEXTS.author} ${libro.autore}` : "Unknown author";
-
-                const prezzo = document.createElement("p");
-                prezzo.innerHTML = libro.valuta && libro.prezzo ? `<b>${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}</b>` : "Price not available";
-
-                const buyButton = document.createElement("button");
-                buyButton.classList.add("buy-now-button");
-                buyButton.textContent = TEXTS.buyNow;
-                if (libro.linkAmazon) {
-                    buyButton.addEventListener("click", () => {
-                        window.open(libro.linkAmazon, "_blank");
-                    });
-                } else {
-                    buyButton.disabled = true;
-                }
-
-                libroDiv.appendChild(immagine);
-                libroDiv.appendChild(titolo);
-                libroDiv.appendChild(autore);
-                libroDiv.appendChild(prezzo);
-                libroDiv.appendChild(buyButton);
                 libroDiv.addEventListener("click", () => mostraInfoLibro(id));
                 libriDiv.appendChild(libroDiv);
             });
@@ -133,40 +69,31 @@ function mostraInfoLibro(libroId) {
         const libro = snapshot.val();
         if (!libro) return;
 
-        popupImage.src = libro.immagine || "placeholder.jpg";
-        popupImage.alt = libro.titolo;
-        popupTitle.textContent = libro.titolo || "Title not available";
-        popupAuthor.textContent = libro.autore ? `${TEXTS.author} ${libro.autore}` : "Unknown author";
-        popupDescription.textContent = libro.descrizione || "No description available.";
-
-        if (libro.valuta && libro.prezzo) {
-            popupPrice.innerHTML = `<b>${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}</b>`;
-        } else {
-            popupPrice.innerHTML = "";
-        }
-
-        popupFormats.style.display = "none"; // Disabilita la visualizzazione dei formati
-
-        if (libro.linkAmazon) {
-            popupBuyNow.style.display = "block";
-            popupBuyNow.onclick = () => window.open(libro.linkAmazon, "_blank");
-        } else {
-            popupBuyNow.style.display = "none";
-        }
-
+        popupContainer.innerHTML = `
+            <div class="popup-content">
+                <span class="close-popup">&times;</span>
+                <img id="popup-image" src="${libro.immagine || 'placeholder.jpg'}" alt="Book Cover">
+                <div class="popup-text">
+                    <h3 id="popup-title">${libro.titolo || 'Title not available'}</h3>
+                    <p id="popup-author">${libro.autore ? `${TEXTS.author} ${libro.autore}` : 'Unknown author'}</p>
+                    <p id="popup-description">${libro.descrizione || 'No description available.'}</p>
+                    <p id="popup-price">${libro.valuta && libro.prezzo ? `<b>${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}</b>` : ''}</p>
+                    <button id="popup-buy-now" class="buy-now-button" ${libro.linkAmazon ? `onclick="window.open('${libro.linkAmazon}', '_blank')"` : 'disabled'}>${TEXTS.buyNow}</button>
+                </div>
+            </div>
+        `;
         popupContainer.style.display = "flex";
+
+        // Chiudi il popup cliccando sulla X
+        document.querySelector(".close-popup").addEventListener("click", () => {
+            popupContainer.style.display = "none";
+        });
     }).catch(error => {
         console.error("Error retrieving book details:", error);
     });
 }
 
-
-// Chiude il popup
-closePopup.addEventListener("click", () => {
-    popupContainer.style.display = "none";
-});
-
-// Inizializza il contenuto
+// Avvia il caricamento dei libri
 mostraLibri();
 mostraLogo();
 mostraBanner();
