@@ -1,23 +1,22 @@
-// Firebase Configuration
+// Configurazione Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyAOIp2reVVoeikYjZUk73yQpZNPaDVvCkw",
     authDomain: "aggiungilibri.firebaseapp.com",
     databaseURL: "https://aggiungilibri-default-rtdb.firebaseio.com",
     projectId: "aggiungilibri",
-    storageBucket: "aggiungilibri.firebasestorage.app",
+    storageBucket: "aggiungilibri.appspot.com",
     messagingSenderId: "215130413037",
     appId: "1:215130413037:web:058d3395ddef3b7441f9e4"
 };
 
-// Initialize Firebase
+// Inizializzazione Firebase
 if (!firebase.apps.length) {
-    console.log("Firebase SDK loaded?", typeof firebase !== "undefined");
     firebase.initializeApp(firebaseConfig);
 } else {
     firebase.app();
 }
 
-// Selectors for HTML elements
+// Selettori per gli elementi HTML
 const libriDiv = document.getElementById("libri");
 const popupContainer = document.getElementById("book-popup");
 const popupImage = document.getElementById("popup-image");
@@ -29,24 +28,48 @@ const popupPrice = document.getElementById("popup-price");
 const popupBuyNow = document.getElementById("popup-buy-now");
 const closePopup = document.querySelector(".close-popup");
 
-// Ensure required elements exist
+// Assicurarsi che gli elementi richiesti esistano
 if (!libriDiv) {
-    console.error("Error: 'libri' element not found in index.html.");
+    console.error("Errore: elemento 'libri' non trovato in index.html.");
 }
 if (!popupContainer) {
-    console.error("Error: 'book-popup' element not found in index.html.");
+    console.error("Errore: elemento 'book-popup' non trovato in index.html.");
+}
+if (!popupImage) {
+    console.error("Errore: elemento 'popup-image' non trovato in index.html.");
+}
+if (!popupTitle) {
+    console.error("Errore: elemento 'popup-title' non trovato in index.html.");
+}
+if (!popupAuthor) {
+    console.error("Errore: elemento 'popup-author' non trovato in index.html.");
+}
+if (!popupDescription) {
+    console.error("Errore: elemento 'popup-description' non trovato in index.html.");
+}
+if (!popupFormats) {
+    console.error("Errore: elemento 'popup-formats' non trovato in index.html.");
+}
+if (!popupPrice) {
+    console.error("Errore: elemento 'popup-price' non trovato in index.html.");
+}
+if (!popupBuyNow) {
+    console.error("Errore: elemento 'popup-buy-now' non trovato in index.html.");
+}
+if (!closePopup) {
+    console.error("Errore: elemento 'close-popup' non trovato in index.html.");
 }
 
-// Function to display books in the catalog
+// Funzione per mostrare i libri nel catalogo
 function mostraLibri() {
     const libriRef = firebase.database().ref("libri");
     libriRef.once("value").then(snapshot => {
         const libri = snapshot.val();
-        libriDiv.innerHTML = ""; // Clear the container before updating
+        libriDiv.innerHTML = ""; // Pulisce il contenitore prima di aggiornarlo
 
         if (libri) {
             Object.entries(libri).forEach(([id, libro]) => {
-                // Create book card
+                // Crea la card del libro
                 const libroDiv = document.createElement("div");
                 libroDiv.classList.add("section-libro");
 
@@ -56,17 +79,17 @@ function mostraLibri() {
                 immagine.classList.add("img-libro");
 
                 const titolo = document.createElement("h3");
-                titolo.textContent = libro.titolo || "Title not available";
+                titolo.textContent = libro.titolo || "Titolo non disponibile";
 
                 const autore = document.createElement("p");
-                autore.textContent = libro.autore ? "by " + libro.autore : "Unknown author";
+                autore.textContent = libro.autore ? "di " + libro.autore : "Autore sconosciuto";
 
                 const prezzo = document.createElement("p");
-                prezzo.innerHTML = libro.valuta && libro.prezzo ? `<b>from ${libro.valuta}${libro.prezzo}</b>` : "Price not available";
+                prezzo.innerHTML = libro.valuta && libro.prezzo ? `<b>da ${libro.valuta}${libro.prezzo}</b>` : "Prezzo non disponibile";
 
                 const buyButton = document.createElement("button");
                 buyButton.classList.add("buy-now-button");
-                buyButton.textContent = "Buy now";
+                buyButton.textContent = "Acquista ora";
                 if (libro.linkAmazon) {
                     buyButton.addEventListener("click", () => {
                         window.open(libro.linkAmazon, "_blank");
@@ -75,49 +98,49 @@ function mostraLibri() {
                     buyButton.disabled = true;
                 }
 
-                // Add elements to the book card
+                // Aggiunge gli elementi alla card del libro
                 libroDiv.appendChild(immagine);
                 libroDiv.appendChild(titolo);
                 libroDiv.appendChild(autore);
                 libroDiv.appendChild(prezzo);
                 libroDiv.appendChild(buyButton);
 
-                // Add event to open the popup
+                // Aggiunge evento per aprire il popup
                 libroDiv.addEventListener("click", () => mostraInfoLibro(id));
 
-                // Append book to catalog
+                // Aggiunge il libro al catalogo
                 libriDiv.appendChild(libroDiv);
             });
         } else {
-            libriDiv.innerHTML = "<p>No books available.</p>";
+            libriDiv.innerHTML = "<p>Nessun libro disponibile.</p>";
         }
     }).catch(error => {
-        console.error("Error fetching books:", error);
+        console.error("Errore nel recupero dei libri:", error);
     });
 }
 
-// Function to show book details in a popup
+// Funzione per mostrare le informazioni del libro nel popup
 function mostraInfoLibro(libroId) {
     const libriRef = firebase.database().ref(`libri/${libroId}`);
     libriRef.once("value").then(snapshot => {
         const libro = snapshot.val();
         if (!libro) return;
 
-        // Update popup content
+        // Aggiorna il contenuto del popup
         popupImage.src = libro.immagine || "placeholder.jpg";
         popupImage.alt = libro.titolo;
-        popupTitle.textContent = libro.titolo || "Title not available";
-        popupAuthor.textContent = libro.autore ? "by " + libro.autore : "Unknown author";
-        popupDescription.textContent = libro.descrizione || "No description available.";
+        popupTitle.textContent = libro.titolo || "Titolo non disponibile";
+        popupAuthor.textContent = libro.autore ? "di " + libro.autore : "Autore sconosciuto";
+        popupDescription.textContent = libro.descrizione || "Nessuna descrizione disponibile.";
 
-        // ✅ FIXED: Ensure "Available formats" is shown correctly
+        // Mostra i formati disponibili
         if (libro.formati && Array.isArray(libro.formati) && libro.formati.length > 0) {
-            popupFormats.textContent = "Available formats: " + libro.formati.join(", ");
+            popupFormats.textContent = "Formati disponibili: " + libro.formati.join(", ");
         } else {
-            popupFormats.textContent = "Format not specified";
+            popupFormats.textContent = "Nessun formato disponibile";
         }
 
-        popupPrice.innerHTML = libro.valuta && libro.prezzo ? `<b>from ${libro.valuta}${libro.prezzo}</b>` : "Price not available";
+        popupPrice.innerHTML = libro.valuta && libro.prezzo ? `<b>da ${libro.valuta}${libro.prezzo}</b>` : "Prezzo non disponibile";
 
         if (libro.linkAmazon) {
             popupBuyNow.style.display = "block";
@@ -126,19 +149,19 @@ function mostraInfoLibro(libroId) {
             popupBuyNow.style.display = "none";
         }
 
-        // Show the popup
+        // Mostra il popup
         popupContainer.style.display = "flex";
     }).catch(error => {
-        console.error("Error fetching book details:", error);
+        console.error("Errore nel recupero dei dettagli del libro:", error);
     });
 }
 
-// Close the popup
+// Chiude il popup
 closePopup.addEventListener("click", () => {
     popupContainer.style.display = "none";
 });
 
-// Load logo and banner
+// Funzione per mostrare il logo
 function mostraLogo() {
     const logo = localStorage.getItem("logo");
     if (logo) {
@@ -146,6 +169,7 @@ function mostraLogo() {
     }
 }
 
+// Funzione per mostrare il banner
 function mostraBanner() {
     const banner = localStorage.getItem("banner");
     if (banner) {
@@ -153,7 +177,7 @@ function mostraBanner() {
     }
 }
 
-// Initialize content
+// Inizializza il contenuto
 mostraLibri();
 mostraLogo();
 mostraBanner();

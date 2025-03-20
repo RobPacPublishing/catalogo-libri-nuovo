@@ -4,7 +4,7 @@ const firebaseConfig = {
     authDomain: "aggiungilibri.firebaseapp.com",
     databaseURL: "https://aggiungilibri-default-rtdb.firebaseio.com",
     projectId: "aggiungilibri",
-    storageBucket: "aggiungilibri.firebasestorage.app",
+    storageBucket: "aggiungilibri.appspot.com",
     messagingSenderId: "215130413037",
     appId: "1:215130413037:web:058d3395ddef3b7441f9e4"
 };
@@ -36,23 +36,13 @@ notifica.id = "notifica";
 document.body.appendChild(notifica);
 
 function mostraNotifica(testo, tipo = "successo") {
-    const notifica = document.getElementById("notifica");
-    if (!notifica) {
-        console.error("⚠️ Errore: l'elemento #notifica non è stato trovato nel DOM.");
-        return;
-    }
-
     notifica.textContent = testo;
     notifica.className = tipo === "errore" ? "notifica-errore" : "notifica-successo";
-
-    // Forza il rendering per garantire che appaia correttamente
     notifica.style.display = "block";
     notifica.style.opacity = "1";
-
-    // Nasconde la notifica dopo 5 secondi con un'animazione di dissolvenza
     setTimeout(() => {
         notifica.style.opacity = "0";
-        setTimeout(() => { notifica.style.display = "none"; }, 500); 
+        setTimeout(() => { notifica.style.display = "none"; }, 500);
     }, 5000);
 }
 
@@ -93,7 +83,6 @@ logoutButton.addEventListener("click", () => {
 function caricaLibri() {
     firebase.database().ref('libri').once('value').then(snapshot => {
         cacheLibri = snapshot.val() ? Object.entries(snapshot.val()).map(([id, libro]) => ({ id, ...libro })) : [];
-        libriInseriti.innerHTML = "";
         mostraLibriInseriti();
     }).catch(error => mostraNotifica("Errore nel caricamento dei libri: " + error.message, "errore"));
 }
@@ -111,6 +100,7 @@ async function uploadImmagine(file) {
         const data = await response.json();
         return data.secure_url;
     } catch (error) {
+        mostraNotifica("Errore nel caricamento dell'immagine: " + error.message, "errore");
         return null;
     }
 }
@@ -126,7 +116,7 @@ libroForm.addEventListener("submit", async function(event) {
     const immagine = document.getElementById("immagine").files[0];
     const prezzo = parseFloat(document.getElementById("prezzo").value.replace(",", "."));
     const valuta = document.getElementById("valuta").value;
-    const formati = Array.from(document.querySelectorAll(".formato-checkbox:checked")).map(cb => cb.value);
+    const formati = Array.from(document.querySelectorAll('input[name="formati"]:checked')).map(checkbox => checkbox.value);
 
     if (!titolo || !autore || !descrizione || !linkAmazon || isNaN(prezzo)) {
         return mostraNotifica("⚠️ Tutti i campi devono essere compilati!", "errore");
@@ -135,7 +125,7 @@ libroForm.addEventListener("submit", async function(event) {
     let urlImmagine = "placeholder.jpg";
     if (immagine) {
         urlImmagine = await uploadImmagine(immagine);
-        if (!urlImmagine) return mostraNotifica("Errore nel caricamento immagine!", "errore");
+        if (!urlImmagine) return;
     }
 
     const libro = { titolo, autore, descrizione, linkAmazon, prezzo: prezzo.toFixed(2), valuta, immagine: urlImmagine, formati };
@@ -152,16 +142,40 @@ libroForm.addEventListener("submit", async function(event) {
 // MOSTRA LIBRI INSERITI SOLO NEL LATO ADMIN
 function mostraLibriInseriti() {
     libriInseriti.innerHTML = "";
-    cacheLibri.forEach(libro => {
+
+    // Applica il filtro testo se presente
+    let libriFiltrati = cacheLibri;
+    if (filtroTesto.value.trim() !== "") {
+        const filtro = filtroTesto.value.trim().toLowerCase();
+        libriFiltrati = libriFiltrati.filter(libro =>
+            libro.titolo.toLowerCase().includes(filtro) ||
+            libro.autore.toLowerCase().includes(filtro) ||
+            libro.descrizione.toLowerCase().includes(filtro)
+        );
+    }
+
+    // Applica l'ordinamento se selezionato
+    if (ordinamento.value === "titolo") {
+        libriFiltrati.sort((a, b) => a.titolo.localeCompare(b.titolo));
+    } else if (ordinamento.value === "autore") {
+        libriFiltrati.sort((a, b) => a.autore.localeCompare(b.autore));
+    } else if (ordinamento.value === "prezzo") {
+        libriFiltrati.sort((a, b) => parseFloat(a.prezzo) - parseFloat(b.prezzo));
+    }
+
+    // Visualizza i libri filtrati e ordinati
+    libriFiltrati.forEach(libro => {
         const div = document.createElement("div");
         div.classList.add("admin-libro");
         div.dataset.id = libro.id;
         div.innerHTML = `
             <h3>${libro.titolo}</h3>
-            <p>${libro.autore}</p>
-            <p><strong>Formats:</strong> ${libro.formati ? libro.formati.join(", ") : "N/A"}</p>
+            <p>Autore: ${libro.autore}</p>
+            <p>Prezzo: ${libro.valuta} ${libro.prezzo}</p>
             <img src="${libro.immagine}" alt="${libro.titolo}" style="width:100px; height:150px;">
-            <button onclick="eliminaLibro('${libro.id}')">❌ Delete</button>
+            <p>Descrizione: ${libro.descrizione}</p>
+            <p>Formati: ${libro.formati && libro.formati.length > 0 ? libro.formati.join(", ") : "Nessun formato specificato"}</p>
+            <button onclick="eliminaLibro('${libro.id}')">❌ Elimina</button>
         `;
         libriInseriti.appendChild(div);
     });
