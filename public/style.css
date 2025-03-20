@@ -48,7 +48,7 @@ header {
     color: white;
     text-align: center;
     z-index: 5;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
 }
@@ -150,6 +150,6 @@ footer {
 /* RESPONSIVE DESIGN */
 @media (max-width: 768px) {
     #titolo-container {
-        font-size: 10px;
+        font-size: 12px;
     }
 }
