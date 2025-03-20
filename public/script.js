@@ -139,11 +139,13 @@ function mostraInfoLibro(libroId) {
         popupAuthor.textContent = libro.autore ? `${TEXTS.author} ${libro.autore}` : "Unknown author";
         popupDescription.textContent = libro.descrizione || "No description available.";
 
-        popupFormats.textContent = libro.formati && Array.isArray(libro.formati) && libro.formati.length > 0
-            ? "Available formats: " + libro.formati.join(", ")
-            : "No formats available";
+        if (libro.valuta && libro.prezzo) {
+            popupPrice.innerHTML = `<b>${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}</b>`;
+        } else {
+            popupPrice.innerHTML = "";
+        }
 
-        popupPrice.innerHTML = libro.valuta && libro.prezzo ? `<b>${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}</b>` : "Price not available";
+        popupFormats.style.display = "none"; // Disabilita la visualizzazione dei formati
 
         if (libro.linkAmazon) {
             popupBuyNow.style.display = "block";
@@ -157,6 +159,7 @@ function mostraInfoLibro(libroId) {
         console.error("Error retrieving book details:", error);
     });
 }
+
 
 // Chiude il popup
 closePopup.addEventListener("click", () => {
