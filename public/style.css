@@ -48,7 +48,7 @@ header {
     color: white;
     text-align: center;
     z-index: 5;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: bold;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
 }
@@ -147,9 +147,95 @@ footer {
     font-size: 14px;
 }
 
+/* POPUP MODAL - Formato Orizzontale */
+#book-popup {
+    display: none;
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 85%;
+    max-width: 900px;
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: left;
+    z-index: 999;
+}
+
+.popup-content {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.popup-content img {
+    width: 35%;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.popup-text {
+    width: 60%;
+    padding: 10px;
+    text-align: left;
+}
+
+#popup-author {
+    margin-top: 10px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* CHIUSURA POPUP */
+.close-popup {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: black;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.close-popup:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+}
+
 /* RESPONSIVE DESIGN */
 @media (max-width: 768px) {
     #titolo-container {
-        font-size: 12px;
+        font-size: 14px;
+    }
+    
+    #logo-catalogo {
+        max-width: 90px;
+    }
+
+    #book-popup {
+        width: 95%;
+        top: 5%;
+    }
+
+    .popup-content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .popup-content img {
+        width: 100%;
+        max-height: 200px;
+    }
+
+    .popup-text {
+        width: 100%;
+        text-align: center;
     }
 }
+
