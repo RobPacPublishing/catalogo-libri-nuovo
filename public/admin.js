@@ -90,6 +90,7 @@ function caricaLibri() {
         mostraLibriInseriti();
     }).catch(error => alert("Errore nel caricamento dei libri: " + error.message));
 }
+
 // FUNZIONE UPLOAD CLOUDINARY
 async function uploadImmagine(file) {
     const formData = new FormData();
@@ -131,7 +132,7 @@ libroForm.addEventListener("submit", async function(event) {
         if (!urlImmagine) return;
     }
 
-    const libro = { titolo, autore, descrizione, linkAmazon, prezzo: prezzo.toFixed(2), valuta, immagine: urlImmagine };
+    const libro = { titolo, autore, linkAmazon, prezzo: prezzo.toFixed(2), valuta, immagine: urlImmagine };
     const libriRef = firebase.database().ref('libri').push();
     libro.id = libriRef.key;
     libriRef.set(libro).then(() => {
@@ -154,24 +155,11 @@ function mostraLibriInseriti() {
             <p>Autore: ${libro.autore}</p>
             <p>Prezzo: ${libro.valuta} ${libro.prezzo}</p>
             <img src="${libro.immagine}" alt="${libro.titolo}" style="width:100px; height:150px;">
-            <p>Descrizione: ${libro.descrizione}</p>
             <button onclick="eliminaLibro('${libro.id}')">❌ Elimina</button>
         `;
         libriInseriti.appendChild(div);
     });
 }
-
-// ELIMINA LIBRO
-function eliminaLibro(libroId) {
-    firebase.database().ref('libri/' + libroId).remove()
-        .then(() => {
-            cacheLibri = cacheLibri.filter(libro => libro.id !== libroId);
-            mostraLibriInseriti();
-            alert("Libro eliminato con successo!");
-        })
-        .catch(error => alert("Errore nell'eliminazione del libro: " + error.message));
-}
-
 // EVENTI FILTRO E ORDINAMENTO
 if (filtroTesto) filtroTesto.addEventListener("input", mostraLibriInseriti);
 if (ordinamento) ordinamento.addEventListener("change", mostraLibriInseriti);

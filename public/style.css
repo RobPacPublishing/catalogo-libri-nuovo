@@ -60,74 +60,12 @@ h2 {
     border-radius: 5px;
 }
 
-/* FORM GESTIONE LIBRI */
-#admin-panel {
-    max-width: 900px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #f5f5f5;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-/* FORM IN GRIGLIA */
-#libro-form {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    align-items: center;
-}
-
-#libro-form label {
-    font-weight: bold;
-}
-
-/* LABEL CHIARA PER UPLOAD IMMAGINE */
-#libro-form #label-immagine {
-    grid-column: span 2;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 10px;
-}
-
-/* TESTO DI SELEZIONE IMMAGINE */
-#libro-form #immagine {
-    width: 100%;
-    display: block;
-    padding: 5px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-/* MENU A TENDINA VALUTE */
-#valuta {
-    width: 100%;
-}
-
-/* MENU VALUTE CON OPZIONI RIORDINATE */
-#valuta option:first-child {
-    font-weight: bold;
-}
-
-/* BOTTONE DI INVIO */
-#libro-form button {
-    grid-column: span 2;
-    background: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-#libro-form button:hover {
-    background: #0056b3;
-}
-
-/* BOOK GRID */
+/* BOOK GRID - Allineamento */
 #libri {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
+    text-align: center;
 }
 
 /* BOOK CARD */
@@ -136,9 +74,11 @@ h2 {
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    text-align: center;
     transition: transform 0.2s ease-in-out;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .section-libro:hover {
@@ -179,7 +119,7 @@ h2 {
     background-color: #e68900;
 }
 
-/* POPUP MODAL */
+/* POPUP MODAL - Formato Orizzontale */
 #book-popup {
     display: none;
     position: fixed;
@@ -195,26 +135,41 @@ h2 {
 .popup-content {
     background: white;
     width: 80%;
-    max-width: 600px;
+    max-width: 800px;
     padding: 20px;
     border-radius: 8px;
-    text-align: center;
-    position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .popup-content img {
-    width: 100%;
+    width: 40%;
     max-height: 300px;
     object-fit: cover;
     border-radius: 5px;
 }
 
+.popup-text {
+    width: 60%;
+    padding: 20px;
+}
+
+/* CHIUSURA POPUP - Visibile su sfondo scuro */
 .close-popup {
     position: absolute;
     top: 10px;
     right: 15px;
     font-size: 24px;
     cursor: pointer;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.close-popup:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+    color: black;
 }
 
 /* ADMIN BOOK LIST */
@@ -242,29 +197,6 @@ h2 {
     object-fit: cover;
 }
 
-/* DELETE BUTTON ADMIN */
-.admin-libro button {
-    background: #ff4d4d;
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    margin-top: 5px;
-}
-
-.admin-libro button:hover {
-    background: #cc0000;
-}
-
-/* RIDUZIONE IMMAGINE GRANDE IN BASSO */
-#libri img {
-    max-width: 120px;
-    height: auto;
-    object-fit: cover;
-}
-
 /* FOOTER */
 footer {
     text-align: center;
@@ -275,66 +207,16 @@ footer {
 
 /* RESPONSIVE DESIGN */
 @media (max-width: 768px) {
-    #logo-catalogo {
-        max-height: 100px;
-    }
-
-    #banner-catalogo {
-        max-height: 200px;
-    }
-
-    #libri {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 10px;
-    }
-
-    .libro {
-        max-width: 180px;
-    }
-
-    .libro img {
-        max-width: 100%;
-    }
-
-    .libro h3 {
-        font-size: 0.9rem;
-    }
-
-    .section-libro img {
-        width: 120px;
-        height: 180px;
-    }
-
-    .info-libro {
+    .popup-content {
         flex-direction: column;
+        align-items: center;
+    }
+
+    .popup-content img {
         width: 100%;
     }
 
-    .info-libro img {
+    .popup-text {
         width: 100%;
-        margin-right: 0;
-        margin-bottom: 20px;
-    }
-
-    #titolo-container h1 {
-        font-size: 20px;
-    }
-
-    #titolo-container h2 {
-        font-size: 16px;
-    }
-
-    #admin-panel {
-        width: 95%;
-        padding: 10px;
-    }
-
-    #libro-form {
-        grid-template-columns: 1fr;
-    }
-
-    #libro-form textarea,
-    #libro-form button {
-        grid-column: span 1;
     }
 }

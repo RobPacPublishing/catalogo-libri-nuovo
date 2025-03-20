@@ -28,6 +28,19 @@ const popupPrice = document.getElementById("popup-price");
 const popupBuyNow = document.getElementById("popup-buy-now");
 const closePopup = document.querySelector(".close-popup");
 
+// Allineamento contenuti delle miniature libri
+libriDiv.style.display = "grid";
+libriDiv.style.gridTemplateColumns = "repeat(auto-fill, minmax(250px, 1fr))";
+libriDiv.style.gap = "20px";
+libriDiv.style.textAlign = "center";
+
+// Traduzione in inglese per il catalogo libri
+const TEXTS = {
+    buyNow: "Buy Now",
+    author: "by",
+    priceFrom: "from "
+};
+
 // Assicurarsi che gli elementi richiesti esistano
 if (!libriDiv) {
     console.error("Errore: elemento 'libri' non trovato in index.html.");
@@ -65,11 +78,10 @@ function mostraLibri() {
     const libriRef = firebase.database().ref("libri");
     libriRef.once("value").then(snapshot => {
         const libri = snapshot.val();
-        libriDiv.innerHTML = ""; // Pulisce il contenitore prima di aggiornarlo
+        libriDiv.innerHTML = "";
 
         if (libri) {
             Object.entries(libri).forEach(([id, libro]) => {
-                // Crea la card del libro
                 const libroDiv = document.createElement("div");
                 libroDiv.classList.add("section-libro");
 
@@ -79,17 +91,17 @@ function mostraLibri() {
                 immagine.classList.add("img-libro");
 
                 const titolo = document.createElement("h3");
-                titolo.textContent = libro.titolo || "Titolo non disponibile";
+                titolo.textContent = libro.titolo || "Title not available";
 
                 const autore = document.createElement("p");
-                autore.textContent = libro.autore ? "di " + libro.autore : "Autore sconosciuto";
+                autore.textContent = libro.autore ? `${TEXTS.author} ${libro.autore}` : "Unknown author";
 
                 const prezzo = document.createElement("p");
-                prezzo.innerHTML = libro.valuta && libro.prezzo ? `<b>da ${libro.valuta}${libro.prezzo}</b>` : "Prezzo non disponibile";
+                prezzo.innerHTML = libro.valuta && libro.prezzo ? `<b>${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}</b>` : "Price not available";
 
                 const buyButton = document.createElement("button");
                 buyButton.classList.add("buy-now-button");
-                buyButton.textContent = "Acquista ora";
+                buyButton.textContent = TEXTS.buyNow;
                 if (libro.linkAmazon) {
                     buyButton.addEventListener("click", () => {
                         window.open(libro.linkAmazon, "_blank");
@@ -98,24 +110,19 @@ function mostraLibri() {
                     buyButton.disabled = true;
                 }
 
-                // Aggiunge gli elementi alla card del libro
                 libroDiv.appendChild(immagine);
                 libroDiv.appendChild(titolo);
                 libroDiv.appendChild(autore);
                 libroDiv.appendChild(prezzo);
                 libroDiv.appendChild(buyButton);
-
-                // Aggiunge evento per aprire il popup
                 libroDiv.addEventListener("click", () => mostraInfoLibro(id));
-
-                // Aggiunge il libro al catalogo
                 libriDiv.appendChild(libroDiv);
             });
         } else {
-            libriDiv.innerHTML = "<p>Nessun libro disponibile.</p>";
+            libriDiv.innerHTML = "<p>No books available.</p>";
         }
     }).catch(error => {
-        console.error("Errore nel recupero dei libri:", error);
+        console.error("Error retrieving books:", error);
     });
 }
 
@@ -126,21 +133,17 @@ function mostraInfoLibro(libroId) {
         const libro = snapshot.val();
         if (!libro) return;
 
-        // Aggiorna il contenuto del popup
         popupImage.src = libro.immagine || "placeholder.jpg";
         popupImage.alt = libro.titolo;
-        popupTitle.textContent = libro.titolo || "Titolo non disponibile";
-        popupAuthor.textContent = libro.autore ? "di " + libro.autore : "Autore sconosciuto";
-        popupDescription.textContent = libro.descrizione || "Nessuna descrizione disponibile.";
+        popupTitle.textContent = libro.titolo || "Title not available";
+        popupAuthor.textContent = libro.autore ? `${TEXTS.author} ${libro.autore}` : "Unknown author";
+        popupDescription.textContent = libro.descrizione || "No description available.";
 
-        // Mostra i formati disponibili
-        if (libro.formati && Array.isArray(libro.formati) && libro.formati.length > 0) {
-            popupFormats.textContent = "Formati disponibili: " + libro.formati.join(", ");
-        } else {
-            popupFormats.textContent = "Nessun formato disponibile";
-        }
+        popupFormats.textContent = libro.formati && Array.isArray(libro.formati) && libro.formati.length > 0
+            ? "Available formats: " + libro.formati.join(", ")
+            : "No formats available";
 
-        popupPrice.innerHTML = libro.valuta && libro.prezzo ? `<b>da ${libro.valuta}${libro.prezzo}</b>` : "Prezzo non disponibile";
+        popupPrice.innerHTML = libro.valuta && libro.prezzo ? `<b>${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}</b>` : "Price not available";
 
         if (libro.linkAmazon) {
             popupBuyNow.style.display = "block";
@@ -149,10 +152,9 @@ function mostraInfoLibro(libroId) {
             popupBuyNow.style.display = "none";
         }
 
-        // Mostra il popup
         popupContainer.style.display = "flex";
     }).catch(error => {
-        console.error("Errore nel recupero dei dettagli del libro:", error);
+        console.error("Error retrieving book details:", error);
     });
 }
 
@@ -160,22 +162,6 @@ function mostraInfoLibro(libroId) {
 closePopup.addEventListener("click", () => {
     popupContainer.style.display = "none";
 });
-
-// Funzione per mostrare il logo
-function mostraLogo() {
-    const logo = localStorage.getItem("logo");
-    if (logo) {
-        document.getElementById("logo-catalogo").src = logo;
-    }
-}
-
-// Funzione per mostrare il banner
-function mostraBanner() {
-    const banner = localStorage.getItem("banner");
-    if (banner) {
-        document.getElementById("banner-catalogo").src = banner;
-    }
-}
 
 // Inizializza il contenuto
 mostraLibri();
