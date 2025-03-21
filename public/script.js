@@ -25,7 +25,7 @@ const popupAuthor = document.getElementById("popup-author");
 const popupDescription = document.getElementById("popup-description");
 const popupPrice = document.getElementById("popup-price");
 const popupBuyNow = document.getElementById("popup-buy-now");
-const closePopup = document.querySelector(".close-popup");
+const closePopupButton = document.querySelector(".close-popup");
 
 // Traduzione in inglese per il catalogo libri
 const TEXTS = {
@@ -64,7 +64,8 @@ function mostraLibri() {
                 buyButton.classList.add("buy-now-button");
                 buyButton.textContent = TEXTS.buyNow;
                 if (libro.linkAmazon) {
-                    buyButton.addEventListener("click", () => {
+                    buyButton.addEventListener("click", (event) => {
+                        event.stopPropagation();
                         window.open(libro.linkAmazon, "_blank");
                     });
                 } else {
@@ -96,10 +97,10 @@ function mostraInfoLibro(libroId) {
 
         popupImage.src = libro.immagine || "placeholder.jpg";
         popupImage.alt = libro.titolo;
-        popupAuthor.textContent = libro.autore ? `${TEXTS.author} ${libro.autore}` : "Unknown author";
         popupTitle.textContent = libro.titolo || "Title not available";
+        popupAuthor.textContent = libro.autore ? `${TEXTS.author} ${libro.autore}` : "Unknown author";
         popupDescription.textContent = libro.descrizione || "No description available.";
-        
+
         if (libro.valuta && libro.prezzo) {
             popupPrice.innerHTML = `<b>${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}</b>`;
         } else {
@@ -120,9 +121,13 @@ function mostraInfoLibro(libroId) {
 }
 
 // Chiude il popup
-closePopup.addEventListener("click", () => {
+function closePopup() {
     popupContainer.style.display = "none";
-});
+}
+
+if (closePopupButton) {
+    closePopupButton.addEventListener("click", closePopup);
+}
 
 // Avvia il caricamento dei libri
 mostraLibri();
