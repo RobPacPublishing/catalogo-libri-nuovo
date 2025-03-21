@@ -93,16 +93,19 @@ async function uploadImmagine(file) {
     formData.append("upload_preset", "robpac_upload");
     formData.append("folder", "copertine");
 
-    try {
-        const response = await fetch("https://api.cloudinary.com/v1_1/robpac/image/upload", { method: "POST", body: formData });
-        if (!response.ok) throw new Error(`Errore nell'upload: ${response.statusText}`);
-        const data = await response.json();
-        return data.secure_url;
-    } catch (error) {
-        mostraNotifica("Errore nel caricamento dell'immagine: " + error.message, "errore");
-        return null;
+try {
+    const response = await fetch("https://api.cloudinary.com/v1_1/robpac/image/upload", { method: "POST", body: formData });
+    if (!response.ok) {
+        mostraNotifica("Errore nel caricamento dell'immagine. Riprova.", "errore");
+        return null; 
     }
+    const data = await response.json();
+    return data.secure_url;
+} catch (error) {
+    mostraNotifica("Errore nel caricamento dell'immagine: " + error.message, "errore");
+    return null;
 }
+
 
 libroForm.addEventListener("submit", async function(event) {
     event.preventDefault();
@@ -121,18 +124,23 @@ libroForm.addEventListener("submit", async function(event) {
     }
 
     // 🔁 CONTROLLO DOPPIONE PER LINK AMAZON
-    const snapshot = await firebase.database().ref("libri").once("value");
-    const libri = snapshot.val();
-    const linkEsistente = Object.values(libri || {}).some(libro => libro.linkAmazon === linkAmazon);
-    if (linkEsistente) {
-        mostraNotifica("🚫 Questo libro è già stato inserito (link Amazon duplicato)", "errore");
-        return;
-    }
+const snapshot = await firebase.database().ref("libri")
+    .orderByChild("linkAmazon")
+    .equalTo(linkAmazon)
+    .once("value");
+
+if (snapshot.exists()) {
+    mostraNotifica("🚫 Questo libro è già stato inserito (link Amazon duplicato)", "errore");
+    return;
+}
+
 
     let urlImmagine = "placeholder.jpg";
     if (immagine) {
         urlImmagine = await uploadImmagine(immagine);
-        if (!urlImmagine) return;
+        if (!urlImmagine) {
+    mostraNotifica("Caricamento immagine fallito. Il libro non è stato salvato.", "errore");
+    return;
     }
 
     const libro = {
@@ -149,14 +157,53 @@ libroForm.addEventListener("submit", async function(event) {
     libro.id = libriRef.key;
     
     libriRef.set(libro).then(() => {
-        cacheLibri.push(libro);
-        mostraLibriInseriti();
+        // Controlla se il libro esiste già nella cache
+const index = cacheLibri.findIndex(l => l.linkAmazon === linkAmazon);
+if (index !== -1) {
+    cacheLibri[index] = libro; // Se il libro esiste già, aggiorna i dati
+} else {
+    cacheLibri.push(libro); // Altrimenti, aggiungi un nuovo libro
+}
+
+// Aggiorna la visualizzazione
+mostraLibriInseriti();
+
         mostraNotifica("📚 Libro aggiunto con successo!");
         libroForm.reset();
     }).catch(error => {
         mostraNotifica("❌ Errore durante l'aggiunta del libro: " + error.message, "errore");
     });
 });
+
+// ELIMINA LIBRO
+function eliminaLibro(libroId) {
+    const confermaDiv = document.createElement("div");
+    confermaDiv.classList.add("notifica-conferma");
+    confermaDiv.innerHTML = `
+        <p>❗ Sei sicuro di voler eliminare questo libro?</p>
+        <button id="conferma-elimina">✅ Conferma</button>
+        <button id="annulla-elimina">❌ Annulla</button>
+    `;
+
+    document.body.appendChild(confermaDiv);
+
+    document.getElementById("conferma-elimina").addEventListener("click", () => {
+        firebase.database().ref(`libri/${libroId}`).remove()
+            .then(() => {
+                cacheLibri = cacheLibri.filter(libro => libro.id !== libroId);
+                mostraLibriInseriti();
+                mostraNotifica("📚 Libro eliminato con successo!");
+            })
+            .catch(error => mostraNotifica("❌ Errore durante l'eliminazione del libro: " + error.message, "errore"));
+
+        confermaDiv.remove(); // Rimuove la finestra di conferma
+    });
+
+    document.getElementById("annulla-elimina").addEventListener("click", () => {
+        mostraNotifica("❌ Eliminazione annullata.");
+        confermaDiv.remove(); // Rimuove la finestra se l'utente annulla
+    });
+}
 
 function mostraLibriInseriti() {
     libriInseriti.innerHTML = "";
@@ -172,9 +219,14 @@ function mostraLibriInseriti() {
 
     const criterio = ordinamento.value;
     libriFiltrati.sort((a, b) => {
-        if (criterio === "prezzo") return parseFloat(a.prezzo) - parseFloat(b.prezzo);
-        return a[criterio].localeCompare(b[criterio]);
-    });
+    if (criterio === "prezzo") {
+        const prezzoA = isNaN(parseFloat(a.prezzo)) ? 0 : parseFloat(a.prezzo);
+        const prezzoB = isNaN(parseFloat(b.prezzo)) ? 0 : parseFloat(b.prezzo);
+        return prezzoA - prezzoB; // Ordina dal più basso al più alto
+    }
+    return a[criterio].localeCompare(b[criterio]);
+});
+
 
     libriFiltrati.forEach(libro => {
         const div = document.createElement("div");
