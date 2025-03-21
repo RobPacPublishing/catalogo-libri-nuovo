@@ -24,6 +24,12 @@ const libriInseriti = document.getElementById("libri-inseriti");
 const filtroTesto = document.getElementById("filtroTesto");
 const ordinamento = document.getElementById("ordinamento");
 const messaggioFeedback = document.getElementById("messaggio-feedback");
+const genereSelect = document.getElementById("genere");
+const nuovoGenereInput = document.getElementById("nuovo-genere");
+const aggiungiGenereBtn = document.getElementById("aggiungi-genere");
+
+// Array dei generi
+let generi = [];
 
 // DISABILITA TEMPORANEAMENTE FORMATI DISPONIBILI
 ["ebook", "paperback", "hardcover"].forEach(id => {
@@ -45,6 +51,43 @@ btnAnnullaModifica.style.marginTop = "10px";
 if (libroForm) {
     libroForm.appendChild(btnAnnullaModifica);
 }
+
+// Crea modal per i dettagli del libro
+const dettagliModal = document.createElement('div');
+dettagliModal.className = 'modal';
+dettagliModal.innerHTML = `
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <div class="libro-dettagli">
+            <img id="dettagli-immagine" src="" alt="Copertina libro">
+            <div class="libro-dettagli-info">
+                <h2 id="dettagli-titolo"></h2>
+                <p id="dettagli-autore"></p>
+                <p id="dettagli-prezzo"></p>
+                <p id="dettagli-genere"></p>
+                <p><a id="dettagli-link" href="#" target="_blank">Vedi su Amazon</a></p>
+            </div>
+        </div>
+        <div class="libro-descrizione">
+            <h3>Descrizione</h3>
+            <p id="dettagli-descrizione"></p>
+        </div>
+    </div>
+`;
+document.body.appendChild(dettagliModal);
+
+// Chiudi modal quando si clicca sulla X
+const closeModal = dettagliModal.querySelector('.close-modal');
+closeModal.addEventListener('click', () => {
+    dettagliModal.style.display = 'none';
+});
+
+// Chiudi modal quando si clicca fuori dal contenuto
+window.addEventListener('click', (event) => {
+    if (event.target === dettagliModal) {
+        dettagliModal.style.display = 'none';
+    }
+});
 
 // Amministratori
 const amministratoriAutorizzati = ["robpacpublishing@gmail.com"];
@@ -69,11 +112,94 @@ function mostraNotifica(testo, tipo = "successo") {
     }, 3000);
 }
 
+// Carica generi dal database
+function caricaGeneri() {
+    firebase.database().ref('generi').once('value').then(snapshot => {
+        if (snapshot.val()) {
+            generi = snapshot.val();
+        } else {
+            generi = [];
+        }
+        aggiornaSelectGeneri();
+    }).catch(error => {
+        console.error("Errore caricamento generi:", error);
+    });
+}
+
+// Aggiorna la select dei generi
+function aggiornaSelectGeneri() {
+    if (!genereSelect) return;
+    
+    // Mantieni la prima opzione vuota
+    genereSelect.innerHTML = '<option value="">Seleziona genere</option>';
+    
+    // Aggiungi i generi dal database
+    generi.forEach(genere => {
+        const option = document.createElement('option');
+        option.value = genere;
+        option.textContent = genere;
+        genereSelect.appendChild(option);
+    });
+}
+
+// Aggiungi nuovo genere
+function aggiungiGenere(nuovoGenere) {
+    if (!nuovoGenere || nuovoGenere.trim() === "") return;
+    
+    nuovoGenere = nuovoGenere.trim();
+    
+    // Controlla se il genere esiste già
+    if (generi.includes(nuovoGenere)) {
+        mostraNotifica("Questo genere esiste già", "errore");
+        return;
+    }
+    
+    // Aggiungi il nuovo genere all'array
+    generi.push(nuovoGenere);
+    
+    // Salva l'array aggiornato nel database
+    firebase.database().ref('generi').set(generi)
+        .then(() => {
+            mostraNotifica(`Genere "${nuovoGenere}" aggiunto con successo`);
+            aggiornaSelectGeneri();
+            
+            // Seleziona il nuovo genere
+            if (genereSelect) {
+                genereSelect.value = nuovoGenere;
+            }
+            
+            // Pulisci il campo di input
+            if (nuovoGenereInput) {
+                nuovoGenereInput.value = "";
+            }
+        })
+        .catch(error => {
+            mostraNotifica("Errore durante l'aggiunta del genere", "errore");
+            console.error("Errore aggiunta genere:", error);
+        });
+}
+
+// Event listener per il pulsante aggiungi genere
+if (aggiungiGenereBtn && nuovoGenereInput) {
+    aggiungiGenereBtn.addEventListener("click", () => {
+        aggiungiGenere(nuovoGenereInput.value);
+    });
+    
+    // Consenti anche di premere Invio nel campo di input
+    nuovoGenereInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Previeni l'invio del form
+            aggiungiGenere(nuovoGenereInput.value);
+        }
+    });
+}
+
 // Autenticazione
 firebase.auth().onAuthStateChanged(user => {
     if (user && amministratoriAutorizzati.includes(user.email)) {
         loginContainer.style.display = "none";
         adminPanel.style.display = "block";
+        caricaGeneri();
         caricaLibri();
     } else {
         loginContainer.style.display = "block";
@@ -146,6 +272,34 @@ function caricaLibri() {
     }).catch(error => alert("Errore nel caricamento dei libri: " + error.message));
 }
 
+// Funzione per mostrare i dettagli del libro
+function mostraDettagliLibro(id) {
+    const libro = cacheLibri.find(libro => libro.id === id);
+    if (!libro) {
+        mostraNotifica("Libro non trovato", "errore");
+        return;
+    }
+    
+    // Popola il modal con i dettagli del libro
+    document.getElementById("dettagli-immagine").src = libro.immagine || "placeholder.jpg";
+    document.getElementById("dettagli-titolo").textContent = libro.titolo || "Titolo non disponibile";
+    document.getElementById("dettagli-autore").textContent = `Autore: ${libro.autore || "Non specificato"}`;
+    document.getElementById("dettagli-prezzo").textContent = `Prezzo: ${libro.valuta || "$"} ${libro.prezzo || "0.00"}`;
+    document.getElementById("dettagli-genere").textContent = libro.genere ? `Genere: ${libro.genere}` : "";
+    document.getElementById("dettagli-descrizione").textContent = libro.descrizione || "Nessuna descrizione disponibile.";
+    
+    const linkAmazon = document.getElementById("dettagli-link");
+    if (libro.linkAmazon) {
+        linkAmazon.href = libro.linkAmazon;
+        linkAmazon.style.display = "inline";
+    } else {
+        linkAmazon.style.display = "none";
+    }
+    
+    // Mostra il modal
+    dettagliModal.style.display = "block";
+}
+
 // Mostra libri
 function mostraLibriInseriti() {
     if (!libriInseriti) return;
@@ -158,7 +312,8 @@ function mostraLibriInseriti() {
         const testoFiltro = filtroTesto.value.toLowerCase();
         libriFiltrati = libriFiltrati.filter(libro =>
             (libro.titolo && libro.titolo.toLowerCase().includes(testoFiltro)) ||
-            (libro.autore && libro.autore.toLowerCase().includes(testoFiltro))
+            (libro.autore && libro.autore.toLowerCase().includes(testoFiltro)) ||
+            (libro.genere && libro.genere.toLowerCase().includes(testoFiltro))
         );
     }
     
@@ -178,11 +333,15 @@ function mostraLibriInseriti() {
         div.className = "admin-libro";
         
         div.innerHTML = `
-            <h3>${libro.titolo || "Titolo"}</h3>
-            <p>Autore: ${libro.autore || "Autore"}</p>
-            <p>Prezzo: ${libro.valuta || "$"} ${libro.prezzo || "0.00"}</p>
-            <img src="${libro.immagine || "placeholder.jpg"}" alt="${libro.titolo}" style="width:100px; height:150px;">
+            <div>
+                <img src="${libro.immagine || "placeholder.jpg"}" alt="${libro.titolo}" style="width:100px; height:150px;">
+                <h3>${libro.titolo || "Titolo"}</h3>
+                <p>Autore: ${libro.autore || "Autore"}</p>
+                <p>Prezzo: ${libro.valuta || "$"} ${libro.prezzo || "0.00"}</p>
+                ${libro.genere ? `<p>Genere: ${libro.genere}</p>` : ''}
+            </div>
             <div class="admin-libro-buttons">
+                <button class="btn-dettagli" data-id="${libro.id}">👁️ Dettagli</button>
                 <button class="btn-modifica" data-id="${libro.id}">✏️ Modifica</button>
                 <button class="btn-elimina" data-id="${libro.id}">❌ Elimina</button>
             </div>
@@ -206,6 +365,14 @@ function mostraLibriInseriti() {
             preparaModificaLibro(id);
         });
     });
+    
+    // Event listener per dettagli
+    document.querySelectorAll(".btn-dettagli").forEach(button => {
+        button.addEventListener("click", function() {
+            const id = this.getAttribute("data-id");
+            mostraDettagliLibro(id);
+        });
+    });
 }
 
 // Elimina libro
@@ -215,9 +382,9 @@ function eliminaLibro(id) {
             .then(() => {
                 cacheLibri = cacheLibri.filter(libro => libro.id !== id);
                 mostraLibriInseriti();
-                mostraNotifica("Libro eliminato con successo!");
+                mostraNotifica("📚 Libro eliminato con successo!");
             })
-            .catch(error => mostraNotifica("Errore durante l'eliminazione", "errore"));
+            .catch(error => mostraNotifica("❌ Errore durante l'eliminazione", "errore"));
     }
 }
 
@@ -237,6 +404,19 @@ function preparaModificaLibro(id) {
     document.getElementById("linkAmazon").value = libroCorrente.linkAmazon || "";
     document.getElementById("prezzo").value = libroCorrente.prezzo || "";
     document.getElementById("valuta").value = libroCorrente.valuta || "$";
+    
+    // Se c'è un campo genere, popolalo
+    if (genereSelect && libroCorrente.genere) {
+        // Se l'opzione esiste, selezionala
+        const options = Array.from(genereSelect.options);
+        const optionToSelect = options.find(option => option.value === libroCorrente.genere);
+        if (optionToSelect) {
+            genereSelect.value = libroCorrente.genere;
+        } else if (libroCorrente.genere) {
+            // Se l'opzione non esiste, aggiungila al database dei generi e poi selezionala
+            aggiungiGenere(libroCorrente.genere);
+        }
+    }
     
     // Cambia il testo del pulsante del form
     const submitButton = libroForm.querySelector("button[type='submit']");
@@ -289,6 +469,9 @@ if (libroForm) {
         const valuta = document.getElementById("valuta").value;
         const immagineFile = document.getElementById("immagine").files[0];
         
+        // Controllo genere, se esiste
+        const genere = genereSelect ? genereSelect.value : "";
+        
         if (!titolo || !autore || !descrizione || !linkAmazon || isNaN(prezzo)) {
             alert("⚠️ Tutti i campi devono essere compilati!");
             return;
@@ -315,7 +498,8 @@ if (libroForm) {
                 linkAmazon,
                 prezzo: prezzo.toFixed(2),
                 valuta,
-                immagine: urlImmagine
+                immagine: urlImmagine,
+                genere: genere || libroCorrente.genere || ""
             };
             
             firebase.database().ref(`libri/${libroCorrente.id}`).update(libro)
@@ -356,15 +540,16 @@ if (libroForm) {
                     urlImmagine = nuovaUrlImmagine;
                 }
             }
-            
-            const libro = {
+
+const libro = {
                 titolo,
                 autore,
                 descrizione,
                 linkAmazon,
                 prezzo: prezzo.toFixed(2),
                 valuta,
-                immagine: urlImmagine
+                immagine: urlImmagine,
+                genere: genere || ""
             };
             
             const libriRef = firebase.database().ref('libri').push();
@@ -375,6 +560,11 @@ if (libroForm) {
                 mostraLibriInseriti();
                 mostraNotifica("📚 Libro aggiunto con successo!");
                 libroForm.reset();
+                
+                // Se è stato specificato un genere e non è già presente nell'elenco, aggiungilo
+                if (genere && !generi.includes(genere)) {
+                    aggiungiGenere(genere);
+                }
             }).catch(error => {
                 mostraNotifica("❌ Errore durante l'aggiunta del libro: " + error.message, "errore");
             });
@@ -391,33 +581,75 @@ if (ordinamento) {
     ordinamento.addEventListener("change", mostraLibriInseriti);
 }
 
-// Aggiungi stili per i pulsanti
-const style = document.createElement('style');
-style.textContent = `
-.admin-libro-buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-}
-.btn-modifica {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 12px;
-}
-.btn-elimina {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 4px;
-    font-size: 12px;
-}
-`;
-document.head.appendChild(style);
+// Backup e Ripristino
+const esportaDatiButton = document.getElementById("esporta-dati");
+const importaDatiInput = document.getElementById("importa-dati");
+const caricaDatiButton = document.getElementById("carica-dati");
 
-console.log("Script admin caricato con upload immagini e funzionalità di modifica");
+if (esportaDatiButton) {
+    esportaDatiButton.addEventListener("click", () => {
+        const dataStr = JSON.stringify(cacheLibri);
+        const dataUri = "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+        
+        const exportFileDefaultName = "libri_backup_" + new Date().toISOString().slice(0, 10) + ".json";
+        
+        const linkElement = document.createElement("a");
+        linkElement.setAttribute("href", dataUri);
+        linkElement.setAttribute("download", exportFileDefaultName);
+        linkElement.click();
+        
+        mostraNotifica("📥 Dati esportati con successo!");
+    });
+}
+
+if (caricaDatiButton && importaDatiInput) {
+    caricaDatiButton.addEventListener("click", () => {
+        const file = importaDatiInput.files[0];
+        if (!file) {
+            mostraNotifica("Seleziona un file JSON da importare", "errore");
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (!Array.isArray(data)) {
+                    throw new Error("Formato file non valido");
+                }
+                
+                if (confirm("⚠️ Questa operazione sovrascriverà tutti i libri esistenti. Continuare?")) {
+                    const dbRef = firebase.database().ref("libri");
+                    
+                    // Elimina tutti i libri esistenti e inserisci quelli nuovi
+                    dbRef.remove().then(() => {
+                        const updates = {};
+                        data.forEach(libro => {
+                            const id = libro.id || dbRef.push().key;
+                            updates[id] = { ...libro, id };
+                            
+                            // Aggiungi il genere se non esiste già
+                            if (libro.genere && !generi.includes(libro.genere)) {
+                                generi.push(libro.genere);
+                                firebase.database().ref('generi').set(generi);
+                            }
+                        });
+                        
+                        dbRef.update(updates).then(() => {
+                            mostraNotifica("📤 Dati importati con successo!");
+                            caricaLibri();
+                            aggiornaSelectGeneri();
+                        }).catch(error => {
+                            mostraNotifica("Errore durante l'importazione: " + error.message, "errore");
+                        });
+                    });
+                }
+            } catch (error) {
+                mostraNotifica("Errore durante la lettura del file: " + error.message, "errore");
+            }
+        };
+        reader.readAsText(file);
+    });
+}
+
+console.log("Script admin caricato con visualizzazione dettagliata e gestione generi");

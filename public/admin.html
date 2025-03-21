@@ -8,43 +8,60 @@
 </head>
 <body>
     <h1>Pannello di amministrazione</h1>
-
+    
     <div id="login-container">
         <button id="login-button">Accedi con Google</button>
     </div>
-
+    
     <div id="admin-panel" style="display: none;">
         <button id="logout-button">Esci</button>
-
+        
         <h2>Inserisci nuovo libro</h2>
-
+        
         <!-- 🔔 Messaggio feedback duplicati o errori -->
         <div id="messaggio-feedback" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>
-
+        
         <form id="libro-form">
             <label for="titolo">Titolo:</label>
             <input type="text" id="titolo" name="titolo" required>
-
+            
             <label for="autore">Autore:</label>
             <input type="text" id="autore" name="autore" required>
-
+            
             <label for="descrizione">Descrizione:</label>
             <textarea id="descrizione" name="descrizione" required></textarea>
-
+            
             <label for="linkAmazon">Link Amazon:</label>
             <input type="url" id="linkAmazon" name="linkAmazon" required>
-
+            
             <label for="immagine">Copertina:</label>
             <input type="file" id="immagine" name="immagine" accept="image/*">
-
-            <label for="prezzo">Prezzo:</label>
-            <select id="valuta" name="valuta">
-                <option value="$">$</option>
-                <option value="€">€</option>
-                <option value="£">£</option>
+            
+            <!-- Nuovo campo per il genere -->
+            <label for="genere">Genere:</label>
+            <select id="genere" name="genere">
+                <option value="">Seleziona genere</option>
             </select>
-            <input type="number" id="prezzo" name="prezzo" step="0.01" required>
-
+            
+            <!-- Campo per aggiungere un nuovo genere -->
+            <div id="nuovo-genere-container" style="margin-top: 10px;">
+                <label for="nuovo-genere">Aggiungi nuovo genere:</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="nuovo-genere" style="flex-grow: 1;">
+                    <button type="button" id="aggiungi-genere" style="width: auto; padding: 5px 10px;">Aggiungi</button>
+                </div>
+            </div>
+            
+            <label for="prezzo">Prezzo:</label>
+            <div style="display: flex; gap: 10px;">
+                <select id="valuta" name="valuta" style="width: 60px;">
+                    <option value="$">$</option>
+                    <option value="€">€</option>
+                    <option value="£">£</option>
+                </select>
+                <input type="number" id="prezzo" name="prezzo" step="0.01" required style="flex-grow: 1;">
+            </div>
+            
             <label for="formati">Formati disponibili:</label><br>
             <input type="checkbox" id="ebook" name="formati" value="eBook">
             <label for="ebook">eBook</label>
@@ -52,36 +69,37 @@
             <label for="paperback">Paperback</label>
             <input type="checkbox" id="hardcover" name="formati" value="Hardcover">
             <label for="hardcover">Hardcover</label>
-
+            
             <button type="submit">Aggiungi libro</button>
         </form>
-
+        
         <h2>Gestione libri</h2>
+        
         <div id="gestione-libri">
             <div id="filtro-container">
-                <input type="text" id="filtroTesto" placeholder="Cerca per titolo o autore...">
+                <input type="text" id="filtroTesto" placeholder="Cerca per titolo, autore o genere...">
                 <select id="ordinamento">
                     <option value="titolo">Ordina per Titolo</option>
                     <option value="autore">Ordina per Autore</option>
                     <option value="prezzo">Ordina per Prezzo</option>
+                    <option value="genere">Ordina per Genere</option>
                 </select>
             </div>
-
+            
             <h3>Libri Inseriti (solo lato admin)</h3>
             <div id="libri-inseriti"></div>
         </div>
-
+        
         <h2>Backup e Ripristino</h2>
         <button id="esporta-dati">Esporta JSON</button>
         <input type="file" id="importa-dati" accept=".json">
         <button id="carica-dati">Importa JSON</button>
     </div>
-
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-    <script src="/admin_simple.js"></script>
+    <script src="/admin_simple.js?v=3"></script>
 </body>
 </html>
-

@@ -87,32 +87,46 @@ button:hover {
     background-color: #218838;
 }
 
-/* Contenitore libri inseriti */
+/* Contenitore libri inseriti - MODIFICATO */
 #libri-inseriti {
     margin-top: 30px;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Adatta il numero di colonne */
-    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Aumentato da 150px a 200px */
+    gap: 20px; /* Aumentato da 15px a 20px */
     justify-content: center;
 }
 
-/* Box singolo per ogni libro */
+/* Box singolo per ogni libro - MODIFICATO */
 .admin-libro {
-    width: 180px;
+    width: 100%; /* Modificato da larghezza fissa a 100% */
+    height: 340px; /* Altezza fissa per tutte le card */
     padding: 15px;
     background: white;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
     transition: transform 0.3s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box; /* Assicura che padding sia incluso nella width/height */
 }
 
 .admin-libro h3 {
     font-size: 14px; /* Ridotto da 16px */
+    margin-top: 5px;
+    margin-bottom: 5px;
+    /* Limita l'altezza del titolo per evitare overflow */
+    max-height: 40px;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 .admin-libro p {
     font-size: 12px; /* Ridotto da 14px */
+    margin: 5px 0;
 }
 
 .admin-libro:hover {
@@ -124,23 +138,56 @@ button:hover {
     height: 150px;
     object-fit: cover;
     border-radius: 5px;
+    margin: 0 auto;
 }
 
-/* Pulsante elimina libro */
-.admin-libro button {
-    width: auto;
-    padding: 8px 12px;
-    background-color: #dc3545;
-    border: none;
-    color: white;
-    font-size: 12px;
-    cursor: pointer;
-    border-radius: 4px;
+/* Pulsante elimina libro - MODIFICATO */
+.admin-libro-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 5px;
     margin-top: 10px;
 }
 
-.admin-libro button:hover {
+.admin-libro button {
+    flex: 1;
+    width: auto;
+    padding: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+.btn-modifica {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+
+.btn-elimina {
+    background-color: #dc3545;
+    border: none;
+    color: white;
+}
+
+.btn-dettagli {
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+}
+
+.btn-modifica:hover {
+    background-color: #3e8e41;
+}
+
+.btn-elimina:hover {
     background-color: #c82333;
+}
+
+.btn-dettagli:hover {
+    background-color: #138496;
 }
 
 /* Etichetta per il campo di upload della copertina */
@@ -150,6 +197,7 @@ label[for="immagine"] {
     margin-top: 10px;
 }
 
+/* Sistema di notifica */
 #notifica {
     position: fixed;
     bottom: 20px;
@@ -171,4 +219,159 @@ label[for="immagine"] {
 
 .notifica-successo {
     background-color: #4CAF50;
+}
+
+/* Filtro e ordinamento */
+#filtro-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+#filtroTesto {
+    flex: 2;
+    min-width: 200px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#ordinamento {
+    flex: 1;
+    min-width: 150px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Stile per la finestra di conferma eliminazione */
+.notifica-conferma {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    text-align: center;
+    width: 300px;
+}
+
+.notifica-conferma p {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.notifica-conferma button {
+    margin: 5px;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+#conferma-elimina {
+    background: #ff4d4d;
+    color: white;
+}
+
+#annulla-elimina {
+    background: #ccc;
+    color: black;
+}
+
+#conferma-elimina:hover {
+    background: #cc0000;
+}
+
+#annulla-elimina:hover {
+    background: #999;
+}
+
+/* Modal per i dettagli del libro */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.libro-dettagli {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.libro-dettagli img {
+    width: 140px;
+    height: 210px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.libro-dettagli-info {
+    flex: 1;
+    min-width: 250px;
+    text-align: left;
+}
+
+.libro-dettagli h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.libro-dettagli-info p {
+    margin: 10px 0;
+}
+
+.libro-descrizione {
+    margin-top: 20px;
+    text-align: left;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #libri-inseriti {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    
+    .admin-libro {
+        height: 320px;
+    }
+    
+    .modal-content {
+        width: 95%;
+        margin: 5% auto;
+    }
 }
