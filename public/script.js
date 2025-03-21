@@ -129,6 +129,16 @@ if (closePopupButton) {
     closePopupButton.addEventListener("click", closePopup);
 }
 
+// Funzione per mostrare il logo
+function mostraLogo() {
+    const logoContainer = document.getElementById("logo-container");
+    if (logoContainer) {
+        logoContainer.style.display = "block"; // Assicura che sia visibile
+    } else {
+        console.error("Errore: elemento 'logo-container' non trovato.");
+    }
+}
+
 // Avvia il caricamento dei libri
 mostraLibri();
 mostraLogo();
