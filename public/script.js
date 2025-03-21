@@ -139,6 +139,16 @@ function mostraLogo() {
     }
 }
 
+// Funzione per mostrare il banner
+function mostraBanner() {
+    const banner = document.getElementById("banner-catalogo");
+    if (banner) {
+        banner.style.display = "block";
+    } else {
+        console.error("Errore: elemento 'banner-catalogo' non trovato.");
+    }
+}
+
 // Avvia il caricamento dei libri
 mostraLibri();
 mostraLogo();
