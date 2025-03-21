@@ -89,37 +89,52 @@ function mostraLibri() {
 }
 
 // Funzione per mostrare le informazioni del libro nel popup
+// Correzione della funzione mostraInfoLibro per gestire correttamente la descrizione
+// Funzione per mostrare le informazioni del libro nel popup
 function mostraInfoLibro(libroId) {
     const libriRef = firebase.database().ref(`libri/${libroId}`);
+    
     libriRef.once("value").then(snapshot => {
         const libro = snapshot.val();
         if (!libro) return;
-
+        
+        // Imposta l'immagine
         popupImage.src = libro.immagine || "placeholder.jpg";
         popupImage.alt = libro.titolo;
+        
+        // Imposta il titolo
         popupTitle.textContent = libro.titolo || "Title not available";
+        
+        // Imposta l'autore
         popupAuthor.textContent = libro.autore ? `${TEXTS.author} ${libro.autore}` : "Unknown author";
-        popupDescription.textContent = libro.descrizione && libro.descrizione.trim() !== "" ? libro.descrizione : "No description available.";
-
+        
+        // Imposta la descrizione - CORREZIONE QUI
+        // Verifica che la descrizione esista e non sia vuota in modo esplicito
+        popupDescription.textContent = libro.descrizione && libro.descrizione.trim() !== "" 
+            ? libro.descrizione 
+            : "No description available.";
+        
+        // Imposta il prezzo
         if (libro.valuta && libro.prezzo) {
             popupPrice.innerHTML = `<b>${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}</b>`;
         } else {
             popupPrice.innerHTML = "";
         }
-
+        
+        // Gestisce il pulsante di acquisto
         if (libro.linkAmazon) {
             popupBuyNow.style.display = "block";
             popupBuyNow.onclick = () => window.open(libro.linkAmazon, "_blank");
         } else {
             popupBuyNow.style.display = "none";
         }
-
+        
+        // Mostra il popup
         popupContainer.style.display = "flex";
     }).catch(error => {
         console.error("Error retrieving book details:", error);
     });
 }
-
 // Chiude il popup
 function closePopup() {
     popupContainer.style.display = "none";
