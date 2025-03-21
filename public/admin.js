@@ -106,24 +106,26 @@ async function uploadImmagine(file) {
 
 libroForm.addEventListener("submit", async function(event) {
     event.preventDefault();
-    messaggioFeedback.textContent = "";
 
-    const titolo = document.getElementById("titolo").value.trim();
-    const autore = document.getElementById("autore").value.trim();
-    const descrizione = document.getElementById("descrizione").value.trim();
-    const linkAmazon = document.getElementById("linkAmazon").value.trim();
-    const prezzo = parseFloat(document.getElementById("prezzo").value.replace(",", "."));
-    const valuta = document.getElementById("valuta").value;
-    const immagine = document.getElementById("immagine").files[0];
+    const titolo = document.getElementById("titolo")?.value.trim() || "";
+    const autore = document.getElementById("autore")?.value.trim() || "";
+    const descrizione = document.getElementById("descrizione")?.value.trim() || "";
+    const linkAmazon = document.getElementById("linkAmazon")?.value.trim() || "";
+    const prezzo = parseFloat(document.getElementById("prezzo")?.value.replace(",", ".")) || 0;
+    const valuta = document.getElementById("valuta")?.value || "$";
+    const immagine = document.getElementById("immagine")?.files[0] || null;
 
     if (!titolo || !autore || !descrizione || !linkAmazon || isNaN(prezzo)) {
-        messaggioFeedback.textContent = "⚠️ Tutti i campi devono essere compilati correttamente.";
+        alert("⚠️ Tutti i campi devono essere compilati!");
         return;
     }
 
-    const duplicato = cacheLibri.some(libro => libro.linkAmazon === linkAmazon);
-    if (duplicato) {
-        messaggioFeedback.textContent = "❌ Questo libro esiste già nel database (link Amazon duplicato).";
+    // 🔁 CONTROLLO DOPPIONE PER LINK AMAZON
+    const snapshot = await firebase.database().ref("libri").once("value");
+    const libri = snapshot.val();
+    const linkEsistente = Object.values(libri || {}).some(libro => libro.linkAmazon === linkAmazon);
+    if (linkEsistente) {
+        mostraNotifica("🚫 Questo libro è già stato inserito (link Amazon duplicato)", "errore");
         return;
     }
 
@@ -133,7 +135,7 @@ libroForm.addEventListener("submit", async function(event) {
         if (!urlImmagine) return;
     }
 
-    const nuovoLibro = {
+    const libro = {
         titolo,
         autore,
         descrizione,
@@ -143,17 +145,17 @@ libroForm.addEventListener("submit", async function(event) {
         immagine: urlImmagine
     };
 
-    const libriRef = firebase.database().ref("libri").push();
-    nuovoLibro.id = libriRef.key;
-    libriRef.set(nuovoLibro)
-        .then(() => {
-            cacheLibri.push(nuovoLibro);
-            mostraLibriInseriti();
-            messaggioFeedback.style.color = "green";
-            messaggioFeedback.textContent = "✅ Libro aggiunto con successo!";
-            libroForm.reset();
-        })
-        .catch(error => alert("Errore durante l'aggiunta del libro: " + error.message));
+    const libriRef = firebase.database().ref('libri').push();
+    libro.id = libriRef.key;
+    
+    libriRef.set(libro).then(() => {
+        cacheLibri.push(libro);
+        mostraLibriInseriti();
+        mostraNotifica("📚 Libro aggiunto con successo!");
+        libroForm.reset();
+    }).catch(error => {
+        mostraNotifica("❌ Errore durante l'aggiunta del libro: " + error.message, "errore");
+    });
 });
 
 function mostraLibriInseriti() {
