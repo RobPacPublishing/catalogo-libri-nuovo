@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pannello di amministrazione</title>
-    <link rel="stylesheet" href="/admin.css">
+    <link rel="stylesheet" href="/admin.css?v=3">
 </head>
 <body>
     <h1>Pannello di amministrazione</h1>
@@ -37,18 +37,38 @@
             <label for="immagine">Copertina:</label>
             <input type="file" id="immagine" name="immagine" accept="image/*">
             
-            <!-- Nuovo campo per il genere -->
-            <label for="genere">Genere:</label>
-            <select id="genere" name="genere">
-                <option value="">Seleziona genere</option>
-            </select>
-            
-            <!-- Campo per aggiungere un nuovo genere -->
-            <div id="nuovo-genere-container" style="margin-top: 10px;">
-                <label for="nuovo-genere">Aggiungi nuovo genere:</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="text" id="nuovo-genere" style="flex-grow: 1;">
-                    <button type="button" id="aggiungi-genere" style="width: auto; padding: 5px 10px;">Aggiungi</button>
+            <!-- Genere e sottogenere (opzionali) -->
+            <div class="genere-container">
+                <div class="genere-column">
+                    <label for="genere">Genere (opzionale):</label>
+                    <select id="genere" name="genere">
+                        <option value="">Seleziona genere</option>
+                    </select>
+                    
+                    <!-- Campo per aggiungere un nuovo genere -->
+                    <div id="nuovo-genere-container" style="margin-top: 10px;">
+                        <label for="nuovo-genere">Aggiungi nuovo genere:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="nuovo-genere" style="flex-grow: 1;">
+                            <button type="button" id="aggiungi-genere" style="width: auto; padding: 5px 10px;">Aggiungi</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="genere-column">
+                    <label for="sottogenere">Sottogenere (opzionale):</label>
+                    <select id="sottogenere" name="sottogenere">
+                        <option value="">Seleziona sottogenere</option>
+                    </select>
+                    
+                    <!-- Campo per aggiungere un nuovo sottogenere -->
+                    <div id="nuovo-sottogenere-container" style="margin-top: 10px;">
+                        <label for="nuovo-sottogenere">Aggiungi nuovo sottogenere:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="nuovo-sottogenere" style="flex-grow: 1;">
+                            <button type="button" id="aggiungi-sottogenere" style="width: auto; padding: 5px 10px;">Aggiungi</button>
+                        </div>
+                    </div>
                 </div>
             </div>
             
@@ -83,6 +103,7 @@
                     <option value="autore">Ordina per Autore</option>
                     <option value="prezzo">Ordina per Prezzo</option>
                     <option value="genere">Ordina per Genere</option>
+                    <option value="sottogenere">Ordina per Sottogenere</option>
                 </select>
             </div>
             

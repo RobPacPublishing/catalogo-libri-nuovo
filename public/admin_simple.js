@@ -27,9 +27,13 @@ const messaggioFeedback = document.getElementById("messaggio-feedback");
 const genereSelect = document.getElementById("genere");
 const nuovoGenereInput = document.getElementById("nuovo-genere");
 const aggiungiGenereBtn = document.getElementById("aggiungi-genere");
+const sottogenereSelect = document.getElementById("sottogenere");
+const nuovoSottogenereInput = document.getElementById("nuovo-sottogenere");
+const aggiungiSottogenereBtn = document.getElementById("aggiungi-sottogenere");
 
-// Array dei generi
+// Array dei generi e sottogeneri
 let generi = [];
+let sottogeneri = [];
 
 // DISABILITA TEMPORANEAMENTE FORMATI DISPONIBILI
 ["ebook", "paperback", "hardcover"].forEach(id => {
@@ -63,8 +67,11 @@ dettagliModal.innerHTML = `
             <div class="libro-dettagli-info">
                 <h2 id="dettagli-titolo"></h2>
                 <p id="dettagli-autore"></p>
+                <div id="dettagli-genere-container">
+                    <span id="dettagli-genere" class="libro-genere"></span>
+                    <span id="dettagli-sottogenere" class="libro-sottogenere"></span>
+                </div>
                 <p id="dettagli-prezzo"></p>
-                <p id="dettagli-genere"></p>
                 <p><a id="dettagli-link" href="#" target="_blank">Vedi su Amazon</a></p>
             </div>
         </div>
@@ -126,6 +133,20 @@ function caricaGeneri() {
     });
 }
 
+// Carica sottogeneri dal database
+function caricaSottogeneri() {
+    firebase.database().ref('sottogeneri').once('value').then(snapshot => {
+        if (snapshot.val()) {
+            sottogeneri = snapshot.val();
+        } else {
+            sottogeneri = [];
+        }
+        aggiornaSelectSottogeneri();
+    }).catch(error => {
+        console.error("Errore caricamento sottogeneri:", error);
+    });
+}
+
 // Aggiorna la select dei generi
 function aggiornaSelectGeneri() {
     if (!genereSelect) return;
@@ -139,6 +160,22 @@ function aggiornaSelectGeneri() {
         option.value = genere;
         option.textContent = genere;
         genereSelect.appendChild(option);
+    });
+}
+
+// Aggiorna la select dei sottogeneri
+function aggiornaSelectSottogeneri() {
+    if (!sottogenereSelect) return;
+    
+    // Mantieni la prima opzione vuota
+    sottogenereSelect.innerHTML = '<option value="">Seleziona sottogenere</option>';
+    
+    // Aggiungi i sottogeneri dal database
+    sottogeneri.forEach(sottogenere => {
+        const option = document.createElement('option');
+        option.value = sottogenere;
+        option.textContent = sottogenere;
+        sottogenereSelect.appendChild(option);
     });
 }
 
@@ -179,6 +216,43 @@ function aggiungiGenere(nuovoGenere) {
         });
 }
 
+// Aggiungi nuovo sottogenere
+function aggiungiSottogenere(nuovoSottogenere) {
+    if (!nuovoSottogenere || nuovoSottogenere.trim() === "") return;
+    
+    nuovoSottogenere = nuovoSottogenere.trim();
+    
+    // Controlla se il sottogenere esiste già
+    if (sottogeneri.includes(nuovoSottogenere)) {
+        mostraNotifica("Questo sottogenere esiste già", "errore");
+        return;
+    }
+    
+    // Aggiungi il nuovo sottogenere all'array
+    sottogeneri.push(nuovoSottogenere);
+    
+    // Salva l'array aggiornato nel database
+    firebase.database().ref('sottogeneri').set(sottogeneri)
+        .then(() => {
+            mostraNotifica(`Sottogenere "${nuovoSottogenere}" aggiunto con successo`);
+            aggiornaSelectSottogeneri();
+            
+            // Seleziona il nuovo sottogenere
+            if (sottogenereSelect) {
+                sottogenereSelect.value = nuovoSottogenere;
+            }
+            
+            // Pulisci il campo di input
+            if (nuovoSottogenereInput) {
+                nuovoSottogenereInput.value = "";
+            }
+        })
+        .catch(error => {
+            mostraNotifica("Errore durante l'aggiunta del sottogenere", "errore");
+            console.error("Errore aggiunta sottogenere:", error);
+        });
+}
+
 // Event listener per il pulsante aggiungi genere
 if (aggiungiGenereBtn && nuovoGenereInput) {
     aggiungiGenereBtn.addEventListener("click", () => {
@@ -194,12 +268,28 @@ if (aggiungiGenereBtn && nuovoGenereInput) {
     });
 }
 
+// Event listener per il pulsante aggiungi sottogenere
+if (aggiungiSottogenereBtn && nuovoSottogenereInput) {
+    aggiungiSottogenereBtn.addEventListener("click", () => {
+        aggiungiSottogenere(nuovoSottogenereInput.value);
+    });
+    
+    // Consenti anche di premere Invio nel campo di input
+    nuovoSottogenereInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Previeni l'invio del form
+            aggiungiSottogenere(nuovoSottogenereInput.value);
+        }
+    });
+}
+
 // Autenticazione
 firebase.auth().onAuthStateChanged(user => {
     if (user && amministratoriAutorizzati.includes(user.email)) {
         loginContainer.style.display = "none";
         adminPanel.style.display = "block";
         caricaGeneri();
+        caricaSottogeneri();
         caricaLibri();
     } else {
         loginContainer.style.display = "block";
@@ -285,7 +375,25 @@ function mostraDettagliLibro(id) {
     document.getElementById("dettagli-titolo").textContent = libro.titolo || "Titolo non disponibile";
     document.getElementById("dettagli-autore").textContent = `Autore: ${libro.autore || "Non specificato"}`;
     document.getElementById("dettagli-prezzo").textContent = `Prezzo: ${libro.valuta || "$"} ${libro.prezzo || "0.00"}`;
-    document.getElementById("dettagli-genere").textContent = libro.genere ? `Genere: ${libro.genere}` : "";
+    
+    // Gestione genere e sottogenere
+    const dettagliGenere = document.getElementById("dettagli-genere");
+    const dettagliSottogenere = document.getElementById("dettagli-sottogenere");
+    
+    if (libro.genere && libro.genere.trim() !== "") {
+        dettagliGenere.textContent = libro.genere;
+        dettagliGenere.style.display = "inline-block";
+    } else {
+        dettagliGenere.style.display = "none";
+    }
+    
+    if (libro.sottogenere && libro.sottogenere.trim() !== "") {
+        dettagliSottogenere.textContent = libro.sottogenere;
+        dettagliSottogenere.style.display = "inline-block";
+    } else {
+        dettagliSottogenere.style.display = "none";
+    }
+    
     document.getElementById("dettagli-descrizione").textContent = libro.descrizione || "Nessuna descrizione disponibile.";
     
     const linkAmazon = document.getElementById("dettagli-link");
@@ -313,7 +421,8 @@ function mostraLibriInseriti() {
         libriFiltrati = libriFiltrati.filter(libro =>
             (libro.titolo && libro.titolo.toLowerCase().includes(testoFiltro)) ||
             (libro.autore && libro.autore.toLowerCase().includes(testoFiltro)) ||
-            (libro.genere && libro.genere.toLowerCase().includes(testoFiltro))
+            (libro.genere && libro.genere.toLowerCase().includes(testoFiltro)) ||
+            (libro.sottogenere && libro.sottogenere.toLowerCase().includes(testoFiltro))
         );
     }
     
@@ -338,7 +447,8 @@ function mostraLibriInseriti() {
                 <h3>${libro.titolo || "Titolo"}</h3>
                 <p>Autore: ${libro.autore || "Autore"}</p>
                 <p>Prezzo: ${libro.valuta || "$"} ${libro.prezzo || "0.00"}</p>
-                ${libro.genere ? `<p>Genere: ${libro.genere}</p>` : ''}
+                ${libro.genere ? `<p class="libro-genere">Genere: ${libro.genere}</p>` : ''}
+                ${libro.sottogenere ? `<p class="libro-sottogenere">Sottogenere: ${libro.sottogenere}</p>` : ''}
             </div>
             <div class="admin-libro-buttons">
                 <button class="btn-dettagli" data-id="${libro.id}">👁️ Dettagli</button>
@@ -418,6 +528,19 @@ function preparaModificaLibro(id) {
         }
     }
     
+    // Se c'è un campo sottogenere, popolalo
+    if (sottogenereSelect && libroCorrente.sottogenere) {
+        // Se l'opzione esiste, selezionala
+        const options = Array.from(sottogenereSelect.options);
+        const optionToSelect = options.find(option => option.value === libroCorrente.sottogenere);
+        if (optionToSelect) {
+            sottogenereSelect.value = libroCorrente.sottogenere;
+        } else if (libroCorrente.sottogenere) {
+            // Se l'opzione non esiste, aggiungila al database dei sottogeneri e poi selezionala
+            aggiungiSottogenere(libroCorrente.sottogenere);
+        }
+    }
+    
     // Cambia il testo del pulsante del form
     const submitButton = libroForm.querySelector("button[type='submit']");
     if (submitButton) {
@@ -469,8 +592,9 @@ if (libroForm) {
         const valuta = document.getElementById("valuta").value;
         const immagineFile = document.getElementById("immagine").files[0];
         
-        // Controllo genere, se esiste
+        // Controllo genere e sottogenere, se esistono (opzionali)
         const genere = genereSelect ? genereSelect.value : "";
+        const sottogenere = sottogenereSelect ? sottogenereSelect.value : "";
         
         if (!titolo || !autore || !descrizione || !linkAmazon || isNaN(prezzo)) {
             alert("⚠️ Tutti i campi devono essere compilati!");
@@ -499,7 +623,8 @@ if (libroForm) {
                 prezzo: prezzo.toFixed(2),
                 valuta,
                 immagine: urlImmagine,
-                genere: genere || libroCorrente.genere || ""
+                genere: genere || "",
+                sottogenere: sottogenere || ""
             };
             
             firebase.database().ref(`libri/${libroCorrente.id}`).update(libro)
@@ -540,8 +665,8 @@ if (libroForm) {
                     urlImmagine = nuovaUrlImmagine;
                 }
             }
-
-const libro = {
+            
+            const libro = {
                 titolo,
                 autore,
                 descrizione,
@@ -549,7 +674,8 @@ const libro = {
                 prezzo: prezzo.toFixed(2),
                 valuta,
                 immagine: urlImmagine,
-                genere: genere || ""
+                genere: genere || "",
+                sottogenere: sottogenere || ""
             };
             
             const libriRef = firebase.database().ref('libri').push();
@@ -564,6 +690,11 @@ const libro = {
                 // Se è stato specificato un genere e non è già presente nell'elenco, aggiungilo
                 if (genere && !generi.includes(genere)) {
                     aggiungiGenere(genere);
+                }
+                
+                // Se è stato specificato un sottogenere e non è già presente nell'elenco, aggiungilo
+                if (sottogenere && !sottogeneri.includes(sottogenere)) {
+                    aggiungiSottogenere(sottogenere);
                 }
             }).catch(error => {
                 mostraNotifica("❌ Errore durante l'aggiunta del libro: " + error.message, "errore");
@@ -633,12 +764,19 @@ if (caricaDatiButton && importaDatiInput) {
                                 generi.push(libro.genere);
                                 firebase.database().ref('generi').set(generi);
                             }
+                            
+                            // Aggiungi il sottogenere se non esiste già
+                            if (libro.sottogenere && !sottogeneri.includes(libro.sottogenere)) {
+                                sottogeneri.push(libro.sottogenere);
+                                firebase.database().ref('sottogeneri').set(sottogeneri);
+                            }
                         });
                         
                         dbRef.update(updates).then(() => {
                             mostraNotifica("📤 Dati importati con successo!");
                             caricaLibri();
                             aggiornaSelectGeneri();
+                            aggiornaSelectSottogeneri();
                         }).catch(error => {
                             mostraNotifica("Errore durante l'importazione: " + error.message, "errore");
                         });
@@ -652,4 +790,4 @@ if (caricaDatiButton && importaDatiInput) {
     });
 }
 
-console.log("Script admin caricato con visualizzazione dettagliata e gestione generi");
+console.log("Script admin caricato con visualizzazione dettagliata e gestione generi/sottogeneri");

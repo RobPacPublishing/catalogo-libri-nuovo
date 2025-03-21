@@ -25,10 +25,12 @@ const popupAuthor = document.getElementById("popup-author");
 const popupDescription = document.getElementById("popup-description");
 const popupPrice = document.getElementById("popup-price");
 const popupGenre = document.getElementById("popup-genre");
+const popupSottogenere = document.getElementById("popup-sottogenere");
 const popupBuyNow = document.getElementById("popup-buy-now");
 const closePopupButton = document.querySelector(".close-popup");
 const filtroTesto = document.getElementById("filtro-testo");
 const filtroGenere = document.getElementById("filtro-genere");
+const filtroSottogenere = document.getElementById("filtro-sottogenere");
 
 // Traduzione in inglese per il catalogo libri
 const TEXTS = {
@@ -36,13 +38,16 @@ const TEXTS = {
     author: "by",
     priceFrom: "from ",
     genre: "Genre: ",
+    subgenre: "Subgenre: ",
     filterAll: "All Genres",
+    filterAllSub: "All Subgenres",
     noBooks: "No books available matching your criteria."
 };
 
 // Array per memorizzare tutti i libri
 let tuttiLibri = [];
 let generiDisponibili = [];
+let sottogeneriDisponibili = [];
 
 // Carica generi disponibili
 function caricaGeneri() {
@@ -51,6 +56,13 @@ function caricaGeneri() {
         aggiornaFiltroGeneri();
     }).catch(error => {
         console.error("Errore caricamento generi:", error);
+    });
+    
+    firebase.database().ref('sottogeneri').once("value").then(snapshot => {
+        sottogeneriDisponibili = snapshot.val() || [];
+        aggiornaFiltroSottogeneri();
+    }).catch(error => {
+        console.error("Errore caricamento sottogeneri:", error);
     });
 }
 
@@ -71,6 +83,25 @@ function aggiornaFiltroGeneri() {
     
     // Event listener per filtro genere
     filtroGenere.addEventListener("change", filtraLibri);
+}
+
+// Aggiorna la select dei sottogeneri
+function aggiornaFiltroSottogeneri() {
+    if (!filtroSottogenere) return;
+    
+    // Opzione per tutti i sottogeneri
+    filtroSottogenere.innerHTML = `<option value="">${TEXTS.filterAllSub}</option>`;
+    
+    // Aggiungi i sottogeneri
+    sottogeneriDisponibili.forEach(sottogenere => {
+        const option = document.createElement('option');
+        option.value = sottogenere;
+        option.textContent = sottogenere;
+        filtroSottogenere.appendChild(option);
+    });
+    
+    // Event listener per filtro sottogenere
+    filtroSottogenere.addEventListener("change", filtraLibri);
 }
 
 // Carica e mostra i libri
@@ -98,8 +129,21 @@ function caricaLibri() {
                 }
             });
             
+            // Estrai tutti i sottogeneri non vuoti dai libri
+            const sottogeneriDaiLibri = [...new Set(tuttiLibri
+                .filter(libro => libro.sottogenere && libro.sottogenere.trim() !== "")
+                .map(libro => libro.sottogenere))];
+            
+            // Aggiungi eventuali sottogeneri mancanti all'array sottogeneriDisponibili
+            sottogeneriDaiLibri.forEach(sottogenere => {
+                if (!sottogeneriDisponibili.includes(sottogenere)) {
+                    sottogeneriDisponibili.push(sottogenere);
+                }
+            });
+            
             // Aggiorna il filtro generi e mostra i libri
             aggiornaFiltroGeneri();
+            aggiornaFiltroSottogeneri();
             filtraLibri();
         } else {
             libriDiv.innerHTML = `<p>${TEXTS.noBooks}</p>`;
@@ -109,12 +153,13 @@ function caricaLibri() {
     });
 }
 
-// Filtra i libri in base a testo e genere
+// Filtra i libri in base a testo, genere e sottogenere
 function filtraLibri() {
     if (!libriDiv) return;
     
     const testoFiltro = filtroTesto ? filtroTesto.value.toLowerCase() : "";
     const genereFiltro = filtroGenere ? filtroGenere.value : "";
+    const sottogenereFiltro = filtroSottogenere ? filtroSottogenere.value : "";
     
     // Applica filtri
     const libriFiltrati = tuttiLibri.filter(libro => {
@@ -127,7 +172,11 @@ function filtraLibri() {
         const matchGenere = !genereFiltro || 
             (libro.genere && libro.genere === genereFiltro);
         
-        return matchTesto && matchGenere;
+        // Filtro per sottogenere
+        const matchSottogenere = !sottogenereFiltro || 
+            (libro.sottogenere && libro.sottogenere === sottogenereFiltro);
+        
+        return matchTesto && matchGenere && matchSottogenere;
     });
     
     mostraLibri(libriFiltrati);
@@ -155,6 +204,7 @@ function mostraLibri(libri) {
             <div class="libro-bottom">
                 <p>${libro.autore ? `${TEXTS.author} ${libro.autore}` : "Unknown author"}</p>
                 ${libro.genere ? `<p class="libro-genere">${TEXTS.genre}${libro.genere}</p>` : ""}
+                ${libro.sottogenere ? `<p class="libro-sottogenere">${TEXTS.subgenre}${libro.sottogenere}</p>` : ""}
                 <p><b>${libro.valuta && libro.prezzo ? `${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}` : "Price not available"}</b></p>
                 <button class="buy-now-button">${TEXTS.buyNow}</button>
             </div>
@@ -196,15 +246,29 @@ function mostraInfoLibro(libroId) {
         // Imposta l'autore
         popupAuthor.textContent = libro.autore ? `${TEXTS.author} ${libro.autore}` : "Unknown author";
         
-        // Imposta la descrizione - CORREZIONE QUI
+        // Imposta la descrizione
         popupDescription.textContent = libro.descrizione && libro.descrizione.trim() !== "" 
             ? libro.descrizione 
             : "No description available.";
         
         // Imposta il genere
         if (popupGenre) {
-            popupGenre.textContent = libro.genere ? `${TEXTS.genre}${libro.genere}` : "";
-            popupGenre.style.display = libro.genere ? "block" : "none";
+            if (libro.genere && libro.genere.trim() !== "") {
+                popupGenre.textContent = `${TEXTS.genre}${libro.genere}`;
+                popupGenre.style.display = "inline-block";
+            } else {
+                popupGenre.style.display = "none";
+            }
+        }
+        
+        // Imposta il sottogenere
+        if (popupSottogenere) {
+            if (libro.sottogenere && libro.sottogenere.trim() !== "") {
+                popupSottogenere.textContent = `${TEXTS.subgenre}${libro.sottogenere}`;
+                popupSottogenere.style.display = "inline-block";
+            } else {
+                popupSottogenere.style.display = "none";
+            }
         }
         
         // Imposta il prezzo
