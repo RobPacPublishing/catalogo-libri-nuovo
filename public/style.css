@@ -24,13 +24,13 @@ header {
 }
 
 #logo-catalogo {
-    max-width: 140px; /* Ingrandito per desktop */
+    max-width: 140px;
     display: block;
 }
 
 @media (max-width: 768px) {
     #logo-catalogo {
-        max-width: 100px; /* Ridotto leggermente per mobile */
+        max-width: 100px;
     }
 }
 
@@ -142,7 +142,7 @@ main {
 #book-popup {
     display: none;
     position: fixed;
-    top: 55vh; /* Spostato più in basso per non coprire il banner */
+    top: 55vh;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 90%;
@@ -151,6 +151,7 @@ main {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 999;
 }
 
 .popup-content {
@@ -173,6 +174,7 @@ main {
     width: 60%;
     padding: 10px;
     text-align: left;
+    overflow-wrap: break-word;
 }
 
 /* CHIUSURA POPUP */
@@ -186,6 +188,7 @@ main {
     background-color: rgba(0, 0, 0, 0.7);
     padding: 5px 10px;
     border-radius: 5px;
+    z-index: 1000;
 }
 
 .close-popup:hover {
@@ -215,4 +218,5 @@ main {
         text-align: center;
     }
 }
+
 

@@ -45,7 +45,7 @@ function mostraLibri() {
             Object.entries(libri).forEach(([id, libro]) => {
                 const libroDiv = document.createElement("div");
                 libroDiv.classList.add("section-libro");
-                
+
                 const immagine = document.createElement("img");
                 immagine.src = libro.immagine || "placeholder.jpg";
                 immagine.alt = libro.titolo;
@@ -99,7 +99,7 @@ function mostraInfoLibro(libroId) {
         popupImage.alt = libro.titolo;
         popupTitle.textContent = libro.titolo || "Title not available";
         popupAuthor.textContent = libro.autore ? `${TEXTS.author} ${libro.autore}` : "Unknown author";
-        popupDescription.textContent = libro.descrizione || "No description available.";
+        popupDescription.textContent = libro.descrizione && libro.descrizione.trim() !== "" ? libro.descrizione : "No description available.";
 
         if (libro.valuta && libro.prezzo) {
             popupPrice.innerHTML = `<b>${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}</b>`;
@@ -129,15 +129,11 @@ if (closePopupButton) {
     closePopupButton.addEventListener("click", closePopup);
 }
 
-// Avvia il caricamento dei libri
-mostraLibri();
-
-
 // Funzione per mostrare il logo
 function mostraLogo() {
     const logoContainer = document.getElementById("logo-container");
     if (logoContainer) {
-        logoContainer.style.display = "block"; // Assicura che sia visibile
+        logoContainer.style.display = "block";
     } else {
         console.error("Errore: elemento 'logo-container' non trovato.");
     }
@@ -153,7 +149,38 @@ function mostraBanner() {
     }
 }
 
-// Avvia il caricamento dei libri
+// Funzione di controllo duplicati (basato su link Amazon)
+async function libroEsiste(linkAmazon) {
+    const snapshot = await firebase.database().ref("libri").orderByChild("linkAmazon").equalTo(linkAmazon).once("value");
+    return snapshot.exists();
+}
+
+// Sovrascrittura evento form per bloccare i duplicati
+const form = document.getElementById("libro-form");
+if (form) {
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const linkAmazon = document.getElementById("linkAmazon").value.trim();
+        if (!linkAmazon) {
+            alert("⚠️ Inserisci il link Amazon.");
+            return;
+        }
+
+        const esiste = await libroEsiste(linkAmazon);
+        if (esiste) {
+            alert("❌ Libro già presente nel catalogo (link Amazon duplicato).");
+            return;
+        }
+
+        // Procedi con la logica originale del submit (eventuale altro script)
+        form.submit();
+    });
+}
+
+// Avvia il caricamento dei libri e logo/banner
 mostraLibri();
 mostraLogo();
 mostraBanner();
+
+
