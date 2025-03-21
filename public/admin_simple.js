@@ -23,6 +23,17 @@ const libroForm = document.getElementById("libro-form");
 const libriInseriti = document.getElementById("libri-inseriti");
 const filtroTesto = document.getElementById("filtroTesto");
 const ordinamento = document.getElementById("ordinamento");
+const messaggioFeedback = document.getElementById("messaggio-feedback");
+
+// DISABILITA TEMPORANEAMENTE FORMATI DISPONIBILI
+["ebook", "paperback", "hardcover"].forEach(id => {
+    const element = document.getElementById(id);
+    if (element) {
+        element.disabled = true;
+        const label = document.querySelector(`label[for="${id}"]`);
+        if (label) label.style.display = "none";
+    }
+});
 
 // Variabili per gestire la modifica dei libri
 let libroCorrente = null; // Per tenere traccia del libro che si sta modificando
@@ -50,7 +61,12 @@ function mostraNotifica(testo, tipo = "successo") {
     notifica.textContent = testo;
     notifica.className = tipo === "errore" ? "notifica-errore" : "notifica-successo";
     notifica.style.display = "block";
-    setTimeout(() => { notifica.style.display = "none"; }, 3000);
+    notifica.style.opacity = "1";
+    
+    setTimeout(() => {
+        notifica.style.opacity = "0";
+        setTimeout(() => { notifica.style.display = "none"; }, 500);
+    }, 3000);
 }
 
 // Autenticazione
@@ -86,6 +102,41 @@ logoutButton.addEventListener("click", () => {
         })
         .catch(error => alert("Errore nel logout"));
 });
+
+// Upload immagine su Cloudinary
+async function uploadImmagine(file) {
+    if (!file) {
+        console.log("Nessun file da caricare");
+        return null;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", "robpac_upload");
+    formData.append("folder", "copertine");
+    
+    try {
+        mostraNotifica("Caricamento immagine in corso...");
+        
+        const response = await fetch("https://api.cloudinary.com/v1_1/robpac/image/upload", {
+            method: "POST",
+            body: formData
+        });
+        
+        if (!response.ok) {
+            mostraNotifica("Errore nel caricamento dell'immagine", "errore");
+            return null;
+        }
+        
+        const data = await response.json();
+        mostraNotifica("Immagine caricata con successo");
+        return data.secure_url;
+    } catch (error) {
+        console.error("Errore upload:", error);
+        mostraNotifica("Errore nel caricamento dell'immagine: " + error.message, "errore");
+        return null;
+    }
+}
 
 // Carica libri
 function caricaLibri() {
@@ -236,15 +287,26 @@ if (libroForm) {
         const linkAmazon = document.getElementById("linkAmazon").value.trim();
         const prezzo = parseFloat(document.getElementById("prezzo").value.replace(",", "."));
         const valuta = document.getElementById("valuta").value;
+        const immagineFile = document.getElementById("immagine").files[0];
         
         if (!titolo || !autore || !descrizione || !linkAmazon || isNaN(prezzo)) {
-            alert("Tutti i campi devono essere compilati!");
+            alert("⚠️ Tutti i campi devono essere compilati!");
             return;
         }
         
         // Se libroCorrente esiste, stiamo modificando, altrimenti stiamo aggiungendo
         if (libroCorrente) {
             // MODIFICA LIBRO ESISTENTE
+            let urlImmagine = libroCorrente.immagine;
+            
+            // Se è stata fornita una nuova immagine, caricala
+            if (immagineFile) {
+                const nuovaUrlImmagine = await uploadImmagine(immagineFile);
+                if (nuovaUrlImmagine) {
+                    urlImmagine = nuovaUrlImmagine;
+                }
+            }
+            
             const libro = {
                 ...libroCorrente,
                 titolo,
@@ -252,7 +314,8 @@ if (libroForm) {
                 descrizione,
                 linkAmazon,
                 prezzo: prezzo.toFixed(2),
-                valuta
+                valuta,
+                immagine: urlImmagine
             };
             
             firebase.database().ref(`libri/${libroCorrente.id}`).update(libro)
@@ -264,7 +327,7 @@ if (libroForm) {
                     }
                     
                     mostraLibriInseriti();
-                    mostraNotifica("Libro aggiornato con successo!");
+                    mostraNotifica("📚 Libro aggiornato con successo!");
                     
                     // Reset del form e dello stato di modifica
                     libroCorrente = null;
@@ -280,10 +343,20 @@ if (libroForm) {
                     btnAnnullaModifica.style.display = "none";
                 })
                 .catch(error => {
-                    mostraNotifica("Errore durante l'aggiornamento del libro: " + error.message, "errore");
+                    mostraNotifica("❌ Errore durante l'aggiornamento del libro: " + error.message, "errore");
                 });
         } else {
             // AGGIUNGI NUOVO LIBRO
+            let urlImmagine = "placeholder.jpg";
+            
+            // Se è stata fornita un'immagine, caricala
+            if (immagineFile) {
+                const nuovaUrlImmagine = await uploadImmagine(immagineFile);
+                if (nuovaUrlImmagine) {
+                    urlImmagine = nuovaUrlImmagine;
+                }
+            }
+            
             const libro = {
                 titolo,
                 autore,
@@ -291,7 +364,7 @@ if (libroForm) {
                 linkAmazon,
                 prezzo: prezzo.toFixed(2),
                 valuta,
-                immagine: "placeholder.jpg"
+                immagine: urlImmagine
             };
             
             const libriRef = firebase.database().ref('libri').push();
@@ -300,10 +373,10 @@ if (libroForm) {
             libriRef.set(libro).then(() => {
                 cacheLibri.push(libro);
                 mostraLibriInseriti();
-                mostraNotifica("Libro aggiunto con successo!");
+                mostraNotifica("📚 Libro aggiunto con successo!");
                 libroForm.reset();
             }).catch(error => {
-                mostraNotifica("Errore durante l'aggiunta del libro", "errore");
+                mostraNotifica("❌ Errore durante l'aggiunta del libro: " + error.message, "errore");
             });
         }
     });
@@ -347,4 +420,4 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-console.log("Script admin semplice caricato con funzionalità di modifica");
+console.log("Script admin caricato con upload immagini e funzionalità di modifica");
