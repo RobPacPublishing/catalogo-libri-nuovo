@@ -129,6 +129,10 @@ if (closePopupButton) {
     closePopupButton.addEventListener("click", closePopup);
 }
 
+// Avvia il caricamento dei libri
+mostraLibri();
+
+
 // Funzione per mostrare il logo
 function mostraLogo() {
     const logoContainer = document.getElementById("logo-container");
