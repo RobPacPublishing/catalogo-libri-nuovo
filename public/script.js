@@ -475,7 +475,9 @@ function mostraLibri(libri) {
                 ${libro.genere ? `<p class="libro-genere">${TEXTS.genre}${libro.genere}</p>` : ""}
                 ${libro.sottogenere ? `<p class="libro-sottogenere">${TEXTS.subgenre}${libro.sottogenere}</p>` : ""}
                 <p><b>${libro.valuta && libro.prezzo ? `${TEXTS.priceFrom}${libro.valuta}${libro.prezzo}` : "Price not available"}</b></p>
-                <button class="buy-now-button">${TEXTS.buyNow}</button>
+                <div class="buy-now-container">
+                    <button class="buy-now-button">${TEXTS.buyNow}</button>
+                </div>
             </div>
         `;
         
@@ -508,6 +510,7 @@ function mostraInfoLibro(libroId) {
         // Imposta l'immagine
         popupImage.src = libro.immagine || "placeholder.jpg";
         popupImage.alt = libro.titolo;
+        popupImage.classList.add("popup-img");  // Aggiungi classe per lo styling migliorato
         
         // Imposta il titolo
         popupTitle.textContent = libro.titolo || "Title not available";
@@ -550,6 +553,7 @@ function mostraInfoLibro(libroId) {
         // Gestisce il pulsante di acquisto
         if (libro.linkAmazon) {
             popupBuyNow.style.display = "block";
+            popupBuyNow.classList.add("large-buy-button");  // Aggiungi classe per il bottone grande
             popupBuyNow.onclick = () => window.open(libro.linkAmazon, "_blank");
         } else {
             popupBuyNow.style.display = "none";
@@ -565,6 +569,9 @@ function mostraInfoLibro(libroId) {
 // Chiude il popup
 function closePopup() {
     popupContainer.style.display = "none";
+    // Rimuovi le classi aggiunte
+    if (popupImage) popupImage.classList.remove("popup-img");
+    if (popupBuyNow) popupBuyNow.classList.remove("large-buy-button");
 }
 
 if (closePopupButton) {

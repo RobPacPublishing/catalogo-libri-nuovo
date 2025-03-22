@@ -82,6 +82,58 @@ const aggiungiGenereBtn = document.getElementById("aggiungi-genere");
 const sottogenereSelect = document.getElementById("sottogenere");
 const nuovoSottogenereInput = document.getElementById("nuovo-sottogenere");
 const aggiungiSottogenereBtn = document.getElementById("aggiungi-sottogenere");
+const immagineInput = document.getElementById("immagine");
+const immaginePreview = document.createElement("div");
+
+// Aggiungi il preview dell'immagine dopo l'input
+if (immagineInput && immagineInput.parentNode) {
+    immaginePreview.className = "immagine-preview";
+    immaginePreview.style.display = "none";
+    immaginePreview.innerHTML = `
+        <img id="preview-img" src="" alt="Anteprima immagine" style="max-width: 200px; margin-top: 10px;">
+        <button id="rimuovi-immagine" type="button" style="display: block; margin-top: 5px;">Rimuovi immagine</button>
+    `;
+    immagineInput.parentNode.insertBefore(immaginePreview, immagineInput.nextSibling);
+    
+    // Event listener per rimuovere l'immagine
+    const rimuoviImmagineBtn = document.getElementById("rimuovi-immagine");
+    if (rimuoviImmagineBtn) {
+        rimuoviImmagineBtn.addEventListener("click", function() {
+            document.getElementById("preview-img").src = "";
+            immaginePreview.style.display = "none";
+            immagineInput.value = ""; // Resetta l'input file
+            // Se stiamo modificando un libro, imposta l'immagine a null
+            if (libroCorrente) {
+                libroCorrente.nuovaImmagine = null;
+                libroCorrente.rimuoviImmagine = true;
+            }
+        });
+    }
+}
+
+// Event listener per anteprima immagine
+if (immagineInput) {
+    immagineInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById('preview-img');
+                if (img) {
+                    img.src = e.target.result;
+                    immaginePreview.style.display = "block";
+                    
+                    // Se stiamo modificando un libro, aggiorna temporaneamente
+                    if (libroCorrente) {
+                        libroCorrente.nuovaImmagine = file;
+                        libroCorrente.rimuoviImmagine = false;
+                    }
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+}
 
 // Array dei generi e sottogeneri
 let generi = [];
@@ -582,7 +634,7 @@ function mostraLibriInseriti() {
         
         div.innerHTML = `
             <div>
-                <img src="${libro.immagine || "placeholder.jpg"}" alt="${libro.titolo}" style="width:100px; height:150px;">
+                <img src="${libro.immagine || "placeholder.jpg"}" alt="${libro.titolo}" style="width:100px; height:150px; object-fit:cover;">
                 <h3>${libro.titolo || "Titolo"}</h3>
                 <p>Autore: ${libro.autore || "Autore"}</p>
                 <p>Prezzo: ${libro.valuta || "$"} ${libro.prezzo || "0.00"}</p>
@@ -653,6 +705,15 @@ function preparaModificaLibro(id) {
     document.getElementById("linkAmazon").value = libroCorrente.linkAmazon || "";
     document.getElementById("prezzo").value = libroCorrente.prezzo || "";
     document.getElementById("valuta").value = libroCorrente.valuta || "$";
+    
+    // Aggiungi la preview dell'immagine corrente
+    if (libroCorrente.immagine) {
+        const img = document.getElementById('preview-img');
+        if (img) {
+            img.src = libroCorrente.immagine;
+            immaginePreview.style.display = "block";
+        }
+    }
     
     // Se c'è un campo genere, popolalo
     if (genereSelect && libroCorrente.genere) {
