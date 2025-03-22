@@ -14,6 +14,58 @@ if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
 }
 
+// Categorie e sottocategorie predefinite
+const CATEGORIES = {
+    "Fiction & Literature": [
+        "Literature & Fiction", 
+        "Mystery, Thriller & Suspense", 
+        "Romance", 
+        "Science Fiction & Fantasy", 
+        "Comics & Graphic Novels", 
+        "Humor & Entertainment", 
+        "Teen & Young Adult", 
+        "Children's Books"
+    ],
+    "Sciences & Knowledge": [
+        "Science & Math", 
+        "Computers & Technology", 
+        "Engineering & Transportation", 
+        "Medical Books", 
+        "Education & Teaching", 
+        "Reference"
+    ],
+    "Society & Culture": [
+        "History", 
+        "Politics & Social Sciences", 
+        "Biographies & Memoirs", 
+        "Religion & Spirituality", 
+        "Law", 
+        "LGBTQ+ Books"
+    ],
+    "Personal Growth & Wellbeing": [
+        "Health, Fitness & Dieting", 
+        "Self-Help", 
+        "Business & Money", 
+        "Parenting & Relationships"
+    ],
+    "Lifestyle & Hobbies": [
+        "Arts & Photography", 
+        "Cookbooks, Food & Wine", 
+        "Crafts, Hobbies & Home", 
+        "Sports & Outdoors", 
+        "Travel", 
+        "Calendars", 
+        "Test Preparation"
+    ],
+    "In lingua italiana": [
+        "Narrativa e Letteratura", 
+        "Scienze e Conoscenza", 
+        "Società e Cultura", 
+        "Crescita Personale e Benessere", 
+        "Stile di Vita e Hobby"
+    ]
+};
+
 // Elementi DOM principali
 const loginButton = document.getElementById("login-button");
 const logoutButton = document.getElementById("logout-button");
@@ -121,11 +173,18 @@ function mostraNotifica(testo, tipo = "successo") {
 
 // Carica generi dal database
 function caricaGeneri() {
+    // Prima inizializziamo con le categorie predefinite
+    generi = Object.keys(CATEGORIES);
+    
+    // Poi carichiamo eventuali generi personalizzati dal database
     firebase.database().ref('generi').once('value').then(snapshot => {
         if (snapshot.val()) {
-            generi = snapshot.val();
-        } else {
-            generi = [];
+            // Aggiungi solo i generi che non sono già nelle categorie predefinite
+            snapshot.val().forEach(genere => {
+                if (!generi.includes(genere)) {
+                    generi.push(genere);
+                }
+            });
         }
         aggiornaSelectGeneri();
     }).catch(error => {
@@ -135,11 +194,25 @@ function caricaGeneri() {
 
 // Carica sottogeneri dal database
 function caricaSottogeneri() {
+    // Prima inizializziamo con le sottocategorie predefinite
+    sottogeneri = [];
+    Object.values(CATEGORIES).forEach(subcategories => {
+        subcategories.forEach(subcat => {
+            if (!sottogeneri.includes(subcat)) {
+                sottogeneri.push(subcat);
+            }
+        });
+    });
+    
+    // Poi carichiamo eventuali sottocategorie personalizzate dal database
     firebase.database().ref('sottogeneri').once('value').then(snapshot => {
         if (snapshot.val()) {
-            sottogeneri = snapshot.val();
-        } else {
-            sottogeneri = [];
+            // Aggiungi solo i sottogeneri che non sono già nelle sottocategorie predefinite
+            snapshot.val().forEach(sottogenere => {
+                if (!sottogeneri.includes(sottogenere)) {
+                    sottogeneri.push(sottogenere);
+                }
+            });
         }
         aggiornaSelectSottogeneri();
     }).catch(error => {
@@ -147,37 +220,103 @@ function caricaSottogeneri() {
     });
 }
 
-// Aggiorna la select dei generi
+// Aggiorna la select dei generi per includere le categorie predefinite
 function aggiornaSelectGeneri() {
     if (!genereSelect) return;
     
-    // Mantieni la prima opzione vuota
-    genereSelect.innerHTML = '<option value="">Seleziona genere</option>';
+    // Le categorie principali sono già incluse nell'HTML come opzioni statiche
     
-    // Aggiungi i generi dal database
-    generi.forEach(genere => {
-        const option = document.createElement('option');
-        option.value = genere;
-        option.textContent = genere;
-        genereSelect.appendChild(option);
-    });
+    // Aggiungi generi personalizzati (se esistono)
+    const customGeneri = generi.filter(genere => !Object.keys(CATEGORIES).includes(genere));
+    if (customGeneri.length > 0) {
+        const customGroup = document.createElement('optgroup');
+        customGroup.label = "Generi personalizzati";
+        
+        customGeneri.forEach(genere => {
+            const option = document.createElement('option');
+            option.value = genere;
+            option.textContent = genere;
+            customGroup.appendChild(option);
+        });
+        
+        genereSelect.appendChild(customGroup);
+    }
+    
+    // Se è in modalità di modifica, seleziona il genere corrente
+    if (libroCorrente && libroCorrente.genere) {
+        genereSelect.value = libroCorrente.genere;
+        
+        // Aggiorna i sottogeneri basati sul genere selezionato
+        if (CATEGORIES[libroCorrente.genere]) {
+            const event = new Event('change');
+            genereSelect.dispatchEvent(event);
+        }
+    }
 }
 
-// Aggiorna la select dei sottogeneri
+// Aggiorna la select dei sottogeneri per gestire le sottocategorie in base al genere
 function aggiornaSelectSottogeneri() {
     if (!sottogenereSelect) return;
     
-    // Mantieni la prima opzione vuota
-    sottogenereSelect.innerHTML = '<option value="">Seleziona sottogenere</option>';
+    // Se un genere principale è selezionato, i suoi sottogeneri saranno mostrati dall'event listener di change
+    const selectedCategory = genereSelect ? genereSelect.value : "";
     
-    // Aggiungi i sottogeneri dal database
-    sottogeneri.forEach(sottogenere => {
-        const option = document.createElement('option');
-        option.value = sottogenere;
-        option.textContent = sottogenere;
-        sottogenereSelect.appendChild(option);
+    if (selectedCategory && CATEGORIES[selectedCategory]) {
+        return; // I sottogeneri sono già gestiti dall'event listener di change
+    }
+    
+    // Aggiungi sottogeneri personalizzati (se esistono)
+    const customSottogeneri = sottogeneri.filter(sottogenere => {
+        // Verifica se il sottogenere non è in nessuna delle categorie predefinite
+        return !Object.values(CATEGORIES).some(subcategories => 
+            subcategories.includes(sottogenere)
+        );
     });
+    
+    if (customSottogeneri.length > 0) {
+        const customGroup = document.createElement('optgroup');
+        customGroup.label = "Sottogeneri personalizzati";
+        
+        customSottogeneri.forEach(sottogenere => {
+            const option = document.createElement('option');
+            option.value = sottogenere;
+            option.textContent = sottogenere;
+            customGroup.appendChild(option);
+        });
+        
+        sottogenereSelect.appendChild(customGroup);
+    }
+    
+    // Se è in modalità di modifica, seleziona il sottogenere corrente
+    if (libroCorrente && libroCorrente.sottogenere) {
+        sottogenereSelect.value = libroCorrente.sottogenere;
+    }
 }
+
+// Aggiorna il dropdown dei sottogeneri in base al genere selezionato
+genereSelect.addEventListener('change', function() {
+    const selectedCategory = this.value;
+    
+    // Aggiorna il dropdown dei sottogeneri in base alla categoria selezionata
+    if (selectedCategory && CATEGORIES[selectedCategory]) {
+        // Ha selezionato una categoria principale, mostra solo i sottogeneri relativi
+        const subcategories = CATEGORIES[selectedCategory];
+        
+        // Resetta il dropdown
+        sottogenereSelect.innerHTML = '<option value="">Seleziona sottogenere</option>';
+        
+        // Aggiungi i sottogeneri della categoria selezionata
+        subcategories.forEach(subcategory => {
+            const option = document.createElement('option');
+            option.value = subcategory;
+            option.textContent = subcategory;
+            sottogenereSelect.appendChild(option);
+        });
+    } else {
+        // Ha selezionato "Seleziona genere" o un genere personalizzato, mostra tutti i sottogeneri
+        aggiornaSelectSottogeneri();
+    }
+});
 
 // Aggiungi nuovo genere
 function aggiungiGenere(nuovoGenere) {
@@ -526,6 +665,9 @@ function preparaModificaLibro(id) {
             // Se l'opzione non esiste, aggiungila al database dei generi e poi selezionala
             aggiungiGenere(libroCorrente.genere);
         }
+        
+        // Simula un evento di cambio per aggiornare i sottogeneri
+        genereSelect.dispatchEvent(new Event('change'));
     }
     
     // Se c'è un campo sottogenere, popolalo

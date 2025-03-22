@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book Catalog</title>
-    <link rel="stylesheet" href="/style.css?v=3">
+    <link rel="stylesheet" href="/style.css?v=4">
 </head>
 <body>
     <header>
@@ -20,6 +20,79 @@
         </div>
     </header>
 
+    <!-- Categories Navigation Bar -->
+    <nav class="categories-nav">
+        <button class="mobile-menu-toggle">☰</button>
+        <ul class="main-categories">
+            <li class="dropdown">
+                <a href="#" data-category="Fiction & Literature">Fiction & Literature</a>
+                <ul class="dropdown-content">
+                    <li><a href="#" data-subcategory="Literature & Fiction">Literature & Fiction</a></li>
+                    <li><a href="#" data-subcategory="Mystery, Thriller & Suspense">Mystery, Thriller & Suspense</a></li>
+                    <li><a href="#" data-subcategory="Romance">Romance</a></li>
+                    <li><a href="#" data-subcategory="Science Fiction & Fantasy">Science Fiction & Fantasy</a></li>
+                    <li><a href="#" data-subcategory="Comics & Graphic Novels">Comics & Graphic Novels</a></li>
+                    <li><a href="#" data-subcategory="Humor & Entertainment">Humor & Entertainment</a></li>
+                    <li><a href="#" data-subcategory="Teen & Young Adult">Teen & Young Adult</a></li>
+                    <li><a href="#" data-subcategory="Children's Books">Children's Books</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" data-category="Sciences & Knowledge">Sciences & Knowledge</a>
+                <ul class="dropdown-content">
+                    <li><a href="#" data-subcategory="Science & Math">Science & Math</a></li>
+                    <li><a href="#" data-subcategory="Computers & Technology">Computers & Technology</a></li>
+                    <li><a href="#" data-subcategory="Engineering & Transportation">Engineering & Transportation</a></li>
+                    <li><a href="#" data-subcategory="Medical Books">Medical Books</a></li>
+                    <li><a href="#" data-subcategory="Education & Teaching">Education & Teaching</a></li>
+                    <li><a href="#" data-subcategory="Reference">Reference</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" data-category="Society & Culture">Society & Culture</a>
+                <ul class="dropdown-content">
+                    <li><a href="#" data-subcategory="History">History</a></li>
+                    <li><a href="#" data-subcategory="Politics & Social Sciences">Politics & Social Sciences</a></li>
+                    <li><a href="#" data-subcategory="Biographies & Memoirs">Biographies & Memoirs</a></li>
+                    <li><a href="#" data-subcategory="Religion & Spirituality">Religion & Spirituality</a></li>
+                    <li><a href="#" data-subcategory="Law">Law</a></li>
+                    <li><a href="#" data-subcategory="LGBTQ+ Books">LGBTQ+ Books</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" data-category="Personal Growth & Wellbeing">Personal Growth & Wellbeing</a>
+                <ul class="dropdown-content">
+                    <li><a href="#" data-subcategory="Health, Fitness & Dieting">Health, Fitness & Dieting</a></li>
+                    <li><a href="#" data-subcategory="Self-Help">Self-Help</a></li>
+                    <li><a href="#" data-subcategory="Business & Money">Business & Money</a></li>
+                    <li><a href="#" data-subcategory="Parenting & Relationships">Parenting & Relationships</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" data-category="Lifestyle & Hobbies">Lifestyle & Hobbies</a>
+                <ul class="dropdown-content">
+                    <li><a href="#" data-subcategory="Arts & Photography">Arts & Photography</a></li>
+                    <li><a href="#" data-subcategory="Cookbooks, Food & Wine">Cookbooks, Food & Wine</a></li>
+                    <li><a href="#" data-subcategory="Crafts, Hobbies & Home">Crafts, Hobbies & Home</a></li>
+                    <li><a href="#" data-subcategory="Sports & Outdoors">Sports & Outdoors</a></li>
+                    <li><a href="#" data-subcategory="Travel">Travel</a></li>
+                    <li><a href="#" data-subcategory="Calendars">Calendars</a></li>
+                    <li><a href="#" data-subcategory="Test Preparation">Test Preparation</a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a href="#" data-category="In lingua italiana">In lingua italiana</a>
+                <ul class="dropdown-content">
+                    <li><a href="#" data-subcategory="Narrativa e Letteratura">Narrativa e Letteratura</a></li>
+                    <li><a href="#" data-subcategory="Scienze e Conoscenza">Scienze e Conoscenza</a></li>
+                    <li><a href="#" data-subcategory="Società e Cultura">Società e Cultura</a></li>
+                    <li><a href="#" data-subcategory="Crescita Personale e Benessere">Crescita Personale e Benessere</a></li>
+                    <li><a href="#" data-subcategory="Stile di Vita e Hobby">Stile di Vita e Hobby</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
     <main>
         <h2>Book Catalog</h2>
 
@@ -27,10 +100,10 @@
         <div class="filter-container">
             <input type="text" id="filtro-testo" placeholder="Search by title or author...">
             <select id="filtro-genere">
-                <option value="">All Genres</option>
+                <option value="">All Categories</option>
             </select>
             <select id="filtro-sottogenere">
-                <option value="">All Subgenres</option>
+                <option value="">All Subcategories</option>
             </select>
         </div>
 
@@ -65,6 +138,6 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="/script.js?v=3"></script>
+    <script src="/script.js?v=4"></script>
 </body>
 </html>

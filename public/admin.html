@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pannello di amministrazione</title>
-    <link rel="stylesheet" href="/admin.css?v=3">
+    <link rel="stylesheet" href="/admin.css?v=4">
 </head>
 <body>
     <h1>Pannello di amministrazione</h1>
@@ -43,6 +43,24 @@
                     <label for="genere">Genere (opzionale):</label>
                     <select id="genere" name="genere">
                         <option value="">Seleziona genere</option>
+                        <optgroup label="Fiction & Literature">
+                            <option value="Fiction & Literature">Fiction & Literature</option>
+                        </optgroup>
+                        <optgroup label="Sciences & Knowledge">
+                            <option value="Sciences & Knowledge">Sciences & Knowledge</option>
+                        </optgroup>
+                        <optgroup label="Society & Culture">
+                            <option value="Society & Culture">Society & Culture</option>
+                        </optgroup>
+                        <optgroup label="Personal Growth & Wellbeing">
+                            <option value="Personal Growth & Wellbeing">Personal Growth & Wellbeing</option>
+                        </optgroup>
+                        <optgroup label="Lifestyle & Hobbies">
+                            <option value="Lifestyle & Hobbies">Lifestyle & Hobbies</option>
+                        </optgroup>
+                        <optgroup label="In lingua italiana">
+                            <option value="In lingua italiana">In lingua italiana</option>
+                        </optgroup>
                     </select>
                     
                     <!-- Campo per aggiungere un nuovo genere -->
@@ -59,6 +77,60 @@
                     <label for="sottogenere">Sottogenere (opzionale):</label>
                     <select id="sottogenere" name="sottogenere">
                         <option value="">Seleziona sottogenere</option>
+                        <!-- Fiction & Literature -->
+                        <optgroup label="Fiction & Literature">
+                            <option value="Literature & Fiction">Literature & Fiction</option>
+                            <option value="Mystery, Thriller & Suspense">Mystery, Thriller & Suspense</option>
+                            <option value="Romance">Romance</option>
+                            <option value="Science Fiction & Fantasy">Science Fiction & Fantasy</option>
+                            <option value="Comics & Graphic Novels">Comics & Graphic Novels</option>
+                            <option value="Humor & Entertainment">Humor & Entertainment</option>
+                            <option value="Teen & Young Adult">Teen & Young Adult</option>
+                            <option value="Children's Books">Children's Books</option>
+                        </optgroup>
+                        <!-- Sciences & Knowledge -->
+                        <optgroup label="Sciences & Knowledge">
+                            <option value="Science & Math">Science & Math</option>
+                            <option value="Computers & Technology">Computers & Technology</option>
+                            <option value="Engineering & Transportation">Engineering & Transportation</option>
+                            <option value="Medical Books">Medical Books</option>
+                            <option value="Education & Teaching">Education & Teaching</option>
+                            <option value="Reference">Reference</option>
+                        </optgroup>
+                        <!-- Society & Culture -->
+                        <optgroup label="Society & Culture">
+                            <option value="History">History</option>
+                            <option value="Politics & Social Sciences">Politics & Social Sciences</option>
+                            <option value="Biographies & Memoirs">Biographies & Memoirs</option>
+                            <option value="Religion & Spirituality">Religion & Spirituality</option>
+                            <option value="Law">Law</option>
+                            <option value="LGBTQ+ Books">LGBTQ+ Books</option>
+                        </optgroup>
+                        <!-- Personal Growth & Wellbeing -->
+                        <optgroup label="Personal Growth & Wellbeing">
+                            <option value="Health, Fitness & Dieting">Health, Fitness & Dieting</option>
+                            <option value="Self-Help">Self-Help</option>
+                            <option value="Business & Money">Business & Money</option>
+                            <option value="Parenting & Relationships">Parenting & Relationships</option>
+                        </optgroup>
+                        <!-- Lifestyle & Hobbies -->
+                        <optgroup label="Lifestyle & Hobbies">
+                            <option value="Arts & Photography">Arts & Photography</option>
+                            <option value="Cookbooks, Food & Wine">Cookbooks, Food & Wine</option>
+                            <option value="Crafts, Hobbies & Home">Crafts, Hobbies & Home</option>
+                            <option value="Sports & Outdoors">Sports & Outdoors</option>
+                            <option value="Travel">Travel</option>
+                            <option value="Calendars">Calendars</option>
+                            <option value="Test Preparation">Test Preparation</option>
+                        </optgroup>
+                        <!-- In lingua italiana -->
+                        <optgroup label="In lingua italiana">
+                            <option value="Narrativa e Letteratura">Narrativa e Letteratura</option>
+                            <option value="Scienze e Conoscenza">Scienze e Conoscenza</option>
+                            <option value="Società e Cultura">Società e Cultura</option>
+                            <option value="Crescita Personale e Benessere">Crescita Personale e Benessere</option>
+                            <option value="Stile di Vita e Hobby">Stile di Vita e Hobby</option>
+                        </optgroup>
                     </select>
                     
                     <!-- Campo per aggiungere un nuovo sottogenere -->
@@ -121,6 +193,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-    <script src="/admin_simple.js?v=3"></script>
+    <script src="/admin_simple.js?v=4"></script>
 </body>
 </html>
