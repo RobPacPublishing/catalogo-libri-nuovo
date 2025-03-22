@@ -202,8 +202,9 @@ main {
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    height: 380px; /* Increased height to accommodate content */
+    height: 400px; /* Aumentata per accomodare correttamente il contenuto */
     overflow: hidden;
+    position: relative; /* Aggiunto per il posizionamento assoluto del pulsante */
 }
 
 .section-libro:hover {
@@ -247,9 +248,9 @@ main {
     border-top: 1px solid #eee;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     flex-grow: 1;
-    min-height: 120px; /* Minimum height for bottom section */
+    position: relative;
+    padding-bottom: 50px; /* Spazio per il pulsante */
 }
 
 .section-libro p {
@@ -265,6 +266,14 @@ main {
 }
 
 /* BUY NOW BUTTON */
+.buy-now-container {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    text-align: center;
+}
+
 .buy-now-button {
     background-color: #ff9900;
     color: white;
@@ -275,7 +284,6 @@ main {
     cursor: pointer;
     border-radius: 5px;
     width: 100%;
-    margin: 8px auto 0;
     transition: background-color 0.2s;
 }
 
@@ -359,6 +367,20 @@ main {
     display: inline-block;
 }
 
+/* Classe aggiuntiva per un pulsante buy-now più grande nel popup */
+.large-buy-button {
+    font-size: 18px !important;
+    padding: 12px 24px !important;
+}
+
+/* Classe per migliorare la visualizzazione dell'immagine nel popup */
+.popup-img {
+    object-fit: contain !important;
+    max-height: 400px !important;
+    width: auto !important;
+    max-width: 100% !important;
+}
+
 /* CHIUSURA POPUP */
 .close-popup {
     position: absolute;
@@ -421,7 +443,7 @@ footer p {
     }
     
     .section-libro {
-        height: 350px; /* Adjusted for mobile */
+        height: 370px; /* Adjusted for mobile */
     }
     
     .libro-top {
@@ -521,7 +543,7 @@ footer p {
     }
     
     .section-libro {
-        height: 330px; /* Adjusted for very small screens */
+        height: 350px; /* Adjusted for very small screens */
     }
     
     .libro-top {
