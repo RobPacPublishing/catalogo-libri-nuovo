@@ -585,3 +585,22 @@ footer p {
   display: block;
   margin: 10px auto;
 }
+
+/* Ombra per il titolo e sottotitolo (immagini) */
+#titolo-img, #sottotitolo-img {
+  filter: drop-shadow(2px 2px 5px rgba(0, 0, 0, 0.7));
+  display: block;
+  margin: 10px auto;
+  max-width: 90%;
+  height: auto;
+}
+
+/* Sfondo leggero dietro al blocco titolo+sottotitolo */
+#titolo-container {
+  background-color: rgba(0, 0, 0, 0.3); /* sfondo nero trasparente */
+  padding: 20px 30px;
+  border-radius: 12px;
+  display: inline-block;
+  text-align: center;
+  margin: 0 auto;
+}
