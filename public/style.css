@@ -595,9 +595,8 @@ footer p {
   height: auto;
 }
 
-/* Sfondo leggero dietro al blocco titolo+sottotitolo */
+/* Contenitore del titolo senza sfondo */
 #titolo-container {
-  background-color: rgba(0, 0, 0, 0.3); /* sfondo nero trasparente */
   padding: 20px 30px;
   border-radius: 12px;
   display: inline-block;
