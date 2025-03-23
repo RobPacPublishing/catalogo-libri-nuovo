@@ -569,12 +569,19 @@ footer p {
 }
 
 #titolo-container h2 {
-  color: gold;
-  text-shadow: -1px -1px 0 #000,  
-               1px -1px 0 #000,
-              -1px  1px 0 #000,
-               1px  1px 0 #000;
+  color: #d4af37; /* oro intenso */
+  text-shadow:
+    -2px -2px 0 #000,
+     2px -2px 0 #000,
+    -2px  2px 0 #000,
+     2px  2px 0 #000;
   font-weight: bold;
   text-align: center;
 }
 
+#sottotitolo-img {
+  width: auto;
+  max-width: 80%;
+  display: block;
+  margin: 10px auto;
+}
