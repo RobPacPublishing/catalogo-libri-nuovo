@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://catalogo-libri-nuovo.vercel.app/sitemap.xml
