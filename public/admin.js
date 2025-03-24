@@ -1,5 +1,33 @@
+// SOLUZIONE PER FIREBASE IN AMBIENTE LOCALE
+// Questo codice viene eseguito prima di tutto il resto
+(function() {
+    // Verifica se stiamo eseguendo da file:// protocollo
+    if (window.location.protocol === 'file:') {
+        // Configura localStorage per funzionare in ambiente locale
+        window.localStorage = {
+            _data: {},
+            setItem: function(id, val) {
+                this._data[id] = String(val);
+                return this._data[id];
+            },
+            getItem: function(id) {
+                return this._data.hasOwnProperty(id) ? this._data[id] : null;
+            },
+            removeItem: function(id) {
+                return delete this._data[id];
+            },
+            clear: function() {
+                this._data = {};
+                return this._data;
+            }
+        };
+        
+        // Override della funzione di autenticazione di Firebase
+        window.firebaseAuthOverride = true;
+    }
+})();
+
 // CONFIGURAZIONE FIREBASE
-// NOTA: In ambiente di produzione, queste credenziali dovrebbero essere protette
 const firebaseConfig = {
     apiKey: "AIzaSyAOIp2reVVoeikYjZUk73yQpZNPaDVvCkw",
     authDomain: "aggiungilibri.firebaseapp.com",
@@ -179,26 +207,50 @@ if (immagineInput && immaginePreview && previewImg && rimuoviImmagineBtn) {
 }
 
 // Controlla autenticazione
-firebase.auth().onAuthStateChanged(user => {
-    if (user && amministratoriAutorizzati.includes(user.email)) {
-        // Utente autenticato e autorizzato
-        if (loginContainer) loginContainer.style.display = "none";
-        if (adminPanel) adminPanel.style.display = "block";
+// Sovrascrivere il comportamento di Firebase Auth in ambiente locale
+if (window.firebaseAuthOverride) {
+    // Mostra direttamente il pannello admin in modalità locale
+    if (loginContainer) loginContainer.style.display = "none";
+    if (adminPanel) adminPanel.style.display = "block";
+    mostraNotifica("Modalità locale: autenticazione automatica");
+    setTimeout(() => {
         caricaLibri();
-        aggiornaSottogeneri(); // Inizializza il dropdown dei sottogeneri
-    } else {
-        // Utente non autenticato o non autorizzato
-        if (loginContainer) loginContainer.style.display = "block";
-        if (adminPanel) adminPanel.style.display = "none";
-        firebase.auth().signOut().catch(error => {
-            console.error("Errore durante il logout:", error);
-        });
-    }
-});
+        aggiornaSottogeneri();
+    }, 500);
+} else {
+    // Comportamento normale con Firebase Auth
+    firebase.auth().onAuthStateChanged(user => {
+        if (user && amministratoriAutorizzati.includes(user.email)) {
+            // Utente autenticato e autorizzato
+            if (loginContainer) loginContainer.style.display = "none";
+            if (adminPanel) adminPanel.style.display = "block";
+            caricaLibri();
+            aggiornaSottogeneri();
+        } else {
+            // Utente non autenticato o non autorizzato
+            if (loginContainer) loginContainer.style.display = "block";
+            if (adminPanel) adminPanel.style.display = "none";
+            firebase.auth().signOut().catch(error => {
+                console.error("Errore durante il logout:", error);
+            });
+        }
+    });
+}
 
 // Login con Google
 if (loginButton) {
     loginButton.addEventListener("click", () => {
+        // Se siamo in modalità locale, simula login
+        if (window.firebaseAuthOverride) {
+            if (loginContainer) loginContainer.style.display = "none";
+            if (adminPanel) adminPanel.style.display = "block";
+            caricaLibri();
+            aggiornaSottogeneri();
+            mostraNotifica("Login simulato in modalità locale");
+            return;
+        }
+        
+        // Altrimenti, comportamento normale di Firebase
         const provider = new firebase.auth.GoogleAuthProvider();
         firebase.auth().signInWithPopup(provider)
             .then(result => {
@@ -221,6 +273,16 @@ if (loginButton) {
 // Logout
 if (logoutButton) {
     logoutButton.addEventListener("click", () => {
+        // Se siamo in modalità locale, simula logout
+        if (window.firebaseAuthOverride) {
+            if (loginContainer) loginContainer.style.display = "block";
+            if (adminPanel) adminPanel.style.display = "none";
+            cacheLibri = [];
+            mostraNotifica("Logout simulato in modalità locale");
+            return;
+        }
+        
+        // Altrimenti, comportamento normale di Firebase
         firebase.auth().signOut()
             .then(() => {
                 mostraNotifica("Logout effettuato con successo!");
@@ -246,11 +308,42 @@ function caricaLibri() {
     // Mostra indicatore di caricamento
     libriInseriti.innerHTML = "<p>Caricamento libri in corso...</p>";
     
+    // In modalità locale, carica da un file locale json se disponibile
+    if (window.firebaseAuthOverride) {
+        try {
+            // Tenta di caricare libri da localStorage
+            const localBooks = localStorage.getItem('robpac_libri');
+            if (localBooks) {
+                cacheLibri = JSON.parse(localBooks);
+                mostraLibriInseriti();
+                mostraNotifica(`Caricati ${cacheLibri.length} libri da storage locale`);
+                return;
+            }
+            
+            // Se non ci sono libri nel localStorage, mostra un messaggio
+            libriInseriti.innerHTML = "<p>Nessun libro trovato nello storage locale. Aggiungi nuovi libri o importa un backup.</p>";
+            mostraNotifica("Nessun libro trovato nello storage locale", "errore");
+        } catch (error) {
+            libriInseriti.innerHTML = "<p>Errore nel caricamento dei libri</p>";
+            mostraNotifica("Errore nel caricamento dei libri locali: " + error.message, "errore");
+            console.error("Errore nel caricamento dei libri:", error);
+        }
+        return;
+    }
+    
+    // Comportamento normale con Firebase
     firebase.database().ref('libri').once('value')
         .then(snapshot => {
             cacheLibri = snapshot.val() 
                 ? Object.entries(snapshot.val()).map(([id, libro]) => ({ id, ...libro })) 
                 : [];
+            
+            // Salva anche in localStorage come backup
+            try {
+                localStorage.setItem('robpac_libri', JSON.stringify(cacheLibri));
+            } catch (e) {
+                console.warn("Impossibile salvare libri in localStorage:", e);
+            }
             
             mostraLibriInseriti();
             
@@ -300,6 +393,19 @@ async function uploadImmagine(file) {
     
     mostraNotifica("Caricamento immagine in corso...");
     
+    // Se siamo in modalità locale, salva l'immagine come Data URL
+    if (window.firebaseAuthOverride) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                mostraNotifica("Immagine salvata localmente");
+                resolve(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    // Comportamento normale con Cloudinary
     const formData = new FormData();
     formData.append("file", file);
     formData.append("upload_preset", "robpac_upload");
@@ -349,98 +455,193 @@ if (libroForm) {
         }
         
         try {
-            // Se stiamo modificando un libro esistente
-            if (libroCorrente) {
-                // Gestione immagine
-                let urlImmagine = libroCorrente.immagine;
+            // Se siamo in modalità locale con Firebase Auth override
+            if (window.firebaseAuthOverride) {
+                // Gestisci aggiunta/modifica libro in locale
                 
-                if (nuovaImmagine) {
-                    const nuovaUrlImmagine = await uploadImmagine(nuovaImmagine);
-                    if (nuovaUrlImmagine) {
-                        urlImmagine = nuovaUrlImmagine;
-                    }
-                }
-                
-                // Aggiorna l'oggetto libro
-                const libroAggiornato = {
-                    ...libroCorrente,
-                    titolo,
-                    autore,
-                    descrizione,
-                    linkAmazon,
-                    prezzo: prezzo.toFixed(2),
-                    valuta,
-                    genere,
-                    sottogenere,
-                    immagine: urlImmagine,
-                    dataModifica: new Date().toISOString()
-                };
-                
-                // Aggiorna nel database
-                await firebase.database().ref(`libri/${libroCorrente.id}`).update(libroAggiornato);
-                
-                // Aggiorna in cache
-                const index = cacheLibri.findIndex(libro => libro.id === libroCorrente.id);
-                if (index !== -1) {
-                    cacheLibri[index] = libroAggiornato;
-                }
-                
-                mostraNotifica("📚 Libro aggiornato con successo!");
-                resetForm();
-                mostraLibriInseriti();
-            } 
-            // Altrimenti, aggiungiamo un nuovo libro
-            else {
-                // Controlla se il libro esiste già (controllo duplicati)
-                const snapshot = await firebase.database().ref("libri")
-                    .orderByChild("linkAmazon")
-                    .equalTo(linkAmazon)
-                    .once("value");
+                // Se stiamo modificando un libro esistente
+                if (libroCorrente) {
+                    // Gestione immagine
+                    let urlImmagine = libroCorrente.immagine;
                     
-                if (snapshot.exists()) {
-                    mostraNotifica("🚫 Questo libro è già stato inserito (link Amazon duplicato)", "errore");
-                    return;
-                }
-                
-                // Gestione immagine
-                let urlImmagine = "placeholder.jpg";
-                
-                if (nuovaImmagine) {
-                    urlImmagine = await uploadImmagine(nuovaImmagine);
-                    if (!urlImmagine) {
-                        mostraNotifica("Caricamento immagine fallito. Continua con immagine placeholder?", "errore");
-                        // Continua con l'immagine di placeholder se l'utente conferma
-                        if (!confirm("Continuare con un'immagine placeholder?")) {
-                            return;
+                    if (nuovaImmagine) {
+                        urlImmagine = await uploadImmagine(nuovaImmagine);
+                    }
+                    
+                    // Aggiorna l'oggetto libro
+                    const libroAggiornato = {
+                        ...libroCorrente,
+                        titolo,
+                        autore,
+                        descrizione,
+                        linkAmazon,
+                        prezzo: prezzo.toFixed(2),
+                        valuta,
+                        genere,
+                        sottogenere,
+                        immagine: urlImmagine,
+                        dataModifica: new Date().toISOString()
+                    };
+                    
+                    // Aggiorna in cache
+                    const index = cacheLibri.findIndex(libro => libro.id === libroCorrente.id);
+                    if (index !== -1) {
+                        cacheLibri[index] = libroAggiornato;
+                    }
+                    
+                    // Salva in localStorage
+                    localStorage.setItem('robpac_libri', JSON.stringify(cacheLibri));
+                    
+                    mostraNotifica("📚 Libro aggiornato con successo!");
+                    resetForm();
+                    mostraLibriInseriti();
+                } 
+                // Altrimenti, aggiungiamo un nuovo libro
+                else {
+                    // Controlla duplicati
+                    const esisteGia = cacheLibri.some(libro => libro.linkAmazon === linkAmazon);
+                    
+                    if (esisteGia) {
+                        mostraNotifica("🚫 Questo libro è già stato inserito (link Amazon duplicato)", "errore");
+                        return;
+                    }
+                    
+                    // Gestione immagine
+                    let urlImmagine = "placeholder.jpg";
+                    
+                    if (nuovaImmagine) {
+                        urlImmagine = await uploadImmagine(nuovaImmagine);
+                        if (!urlImmagine) {
+                            mostraNotifica("Caricamento immagine fallito. Continua con immagine placeholder?", "errore");
+                            if (!confirm("Continuare con un'immagine placeholder?")) {
+                                return;
+                            }
                         }
                     }
+                    
+                    // Crea un ID univoco
+                    const id = "local_" + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+                    
+                    // Crea oggetto libro
+                    const libro = {
+                        id,
+                        titolo,
+                        autore,
+                        descrizione,
+                        linkAmazon,
+                        prezzo: prezzo.toFixed(2),
+                        valuta,
+                        genere,
+                        sottogenere,
+                        immagine: urlImmagine,
+                        dataInserimento: new Date().toISOString()
+                    };
+                    
+                    // Aggiorna cache locale e UI
+                    cacheLibri.push(libro);
+                    localStorage.setItem('robpac_libri', JSON.stringify(cacheLibri));
+                    
+                    mostraLibriInseriti();
+                    mostraNotifica("📚 Libro aggiunto con successo!");
+                    resetForm();
                 }
-                
-                // Crea oggetto libro
-                const libro = {
-                    titolo,
-                    autore,
-                    descrizione,
-                    linkAmazon,
-                    prezzo: prezzo.toFixed(2),
-                    valuta,
-                    genere,
-                    sottogenere,
-                    immagine: urlImmagine,
-                    dataInserimento: new Date().toISOString()
-                };
-                
-                // Salva nel database
-                const libriRef = firebase.database().ref('libri').push();
-                libro.id = libriRef.key;
-                
-                await libriRef.set(libro);
-                
-                // Aggiorna cache locale e UI
-                cacheLibri.push(libro);
-                mostraLibriInseriti();
-                mostraNotifica("📚 Libro aggiunto con successo!");
-                resetForm();
+            } 
+            // Comportamento normale con Firebase
+            else {
+                // Se stiamo modificando un libro esistente
+                if (libroCorrente) {
+                    // Gestione immagine
+                    let urlImmagine = libroCorrente.immagine;
+                    
+                    if (nuovaImmagine) {
+                        const nuovaUrlImmagine = await uploadImmagine(nuovaImmagine);
+                        if (nuovaUrlImmagine) {
+                            urlImmagine = nuovaUrlImmagine;
+                        }
+                    }
+                    
+                    // Aggiorna l'oggetto libro
+                    const libroAggiornato = {
+                        ...libroCorrente,
+                        titolo,
+                        autore,
+                        descrizione,
+                        linkAmazon,
+                        prezzo: prezzo.toFixed(2),
+                        valuta,
+                        genere,
+                        sottogenere,
+                        immagine: urlImmagine,
+                        dataModifica: new Date().toISOString()
+                    };
+                    
+                    // Aggiorna nel database
+                    await firebase.database().ref(`libri/${libroCorrente.id}`).update(libroAggiornato);
+                    
+                    // Aggiorna in cache
+                    const index = cacheLibri.findIndex(libro => libro.id === libroCorrente.id);
+                    if (index !== -1) {
+                        cacheLibri[index] = libroAggiornato;
+                    }
+                    
+                    mostraNotifica("📚 Libro aggiornato con successo!");
+                    resetForm();
+                    mostraLibriInseriti();
+                } 
+                // Altrimenti, aggiungiamo un nuovo libro
+                else {
+                    // Controlla se il libro esiste già (controllo duplicati)
+                    const snapshot = await firebase.database().ref("libri")
+                        .orderByChild("linkAmazon")
+                        .equalTo(linkAmazon)
+                        .once("value");
+                        
+                    if (snapshot.exists()) {
+                        mostraNotifica("🚫 Questo libro è già stato inserito (link Amazon duplicato)", "errore");
+                        return;
+                    }
+                    
+                    // Gestione immagine
+                    let urlImmagine = "placeholder.jpg";
+                    
+                    if (nuovaImmagine) {
+                        urlImmagine = await uploadImmagine(nuovaImmagine);
+                        if (!urlImmagine) {
+                            mostraNotifica("Caricamento immagine fallito. Continua con immagine placeholder?", "errore");
+                            // Continua con l'immagine di placeholder se l'utente conferma
+                            if (!confirm("Continuare con un'immagine placeholder?")) {
+                                return;
+                            }
+                        }
+                    }
+                    
+                    // Crea oggetto libro
+                    const libro = {
+                        titolo,
+                        autore,
+                        descrizione,
+                        linkAmazon,
+                        prezzo: prezzo.toFixed(2),
+                        valuta,
+                        genere,
+                        sottogenere,
+                        immagine: urlImmagine,
+                        dataInserimento: new Date().toISOString()
+                    };
+                    
+                    // Salva nel database
+                    const libriRef = firebase.database().ref('libri').push();
+                    libro.id = libriRef.key;
+                    
+                    await libriRef.set(libro);
+                    
+                    // Aggiorna cache locale e UI
+                    cacheLibri.push(libro);
+                    localStorage.setItem('robpac_libri', JSON.stringify(cacheLibri));
+                    mostraLibriInseriti();
+                    mostraNotifica("📚 Libro aggiunto con successo!");
+                    resetForm();
+                }
             }
             
             // Scroll alla lista libri
@@ -460,7 +661,7 @@ function mostraLibriInseriti() {
     
     libriInseriti.innerHTML = "";
     
-    if (cacheLibri.length === 0) {
+    if (!cacheLibri || cacheLibri.length === 0) {
         libriInseriti.innerHTML = "<p>Nessun libro presente nel catalogo</p>";
         return;
     }
@@ -553,7 +754,7 @@ function mostraDettagliLibro(libroId) {
         return;
     }
     
-    // Crea modal per i dettagli
+// Crea modal per i dettagli
     const modal = document.createElement("div");
     modal.className = "modal";
     
@@ -688,10 +889,33 @@ function eliminaLibro(libroId) {
     
     // Event listener per conferma eliminazione
     document.getElementById("conferma-elimina").addEventListener("click", () => {
+        // Se siamo in modalità locale
+        if (window.firebaseAuthOverride) {
+            // Elimina dalla cache locale
+            cacheLibri = cacheLibri.filter(libro => libro.id !== libroId);
+            
+            // Aggiorna localStorage
+            localStorage.setItem('robpac_libri', JSON.stringify(cacheLibri));
+            
+            mostraLibriInseriti();
+            mostraNotifica("📚 Libro eliminato con successo!");
+            confermaDiv.remove();
+            return;
+        }
+        
+        // Altrimenti usa Firebase
         firebase.database().ref(`libri/${libroId}`).remove()
         .then(() => {
             // Aggiorna la cache locale
             cacheLibri = cacheLibri.filter(libro => libro.id !== libroId);
+            
+            // Aggiorna localStorage
+            try {
+                localStorage.setItem('robpac_libri', JSON.stringify(cacheLibri));
+            } catch (e) {
+                console.warn("Impossibile aggiornare localStorage", e);
+            }
+            
             mostraLibriInseriti();
             mostraNotifica("📚 Libro eliminato con successo!");
         })
@@ -776,6 +1000,28 @@ async function importaBackup(file) {
         
         mostraNotifica("Importazione in corso...");
         
+        // Se siamo in modalità locale
+        if (window.firebaseAuthOverride) {
+            // Genera nuovi ID locali per tutti i libri importati
+            libriImportati = libriImportati.map(libro => {
+                const newId = "local_" + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+                return { ...libro, id: newId };
+            });
+            
+            // Sovrascrivi la cache locale
+            cacheLibri = libriImportati;
+            
+            // Aggiorna localStorage
+            localStorage.setItem('robpac_libri', JSON.stringify(cacheLibri));
+            
+            // Aggiorna UI
+            mostraLibriInseriti();
+            mostraNotifica(`📤 Importati con successo ${libriImportati.length} libri!`);
+            return;
+        }
+        
+        // Altrimenti usa Firebase per l'importazione
+        
         // Prepara gli aggiornamenti
         const updates = {};
         
@@ -797,8 +1043,8 @@ async function importaBackup(file) {
         // Esegui l'aggiornamento al database
         await firebase.database().ref().update(updates);
         
-        // Ricarica i libri
-        caricaLibri();
+        // Aggiorna la cache locale
+        await caricaLibri();
         
         mostraNotifica(`📤 Importati con successo ${libriImportati.length} libri!`);
     } catch (error) {
@@ -896,5 +1142,21 @@ modalStyles.textContent = `
 
 document.head.appendChild(modalStyles);
 
+// Aggiunge uno stile per il messaggio di ambiente locale
+if (window.firebaseAuthOverride) {
+    const localModeStyle = document.createElement("div");
+    localModeStyle.style.position = "fixed";
+    localModeStyle.style.bottom = "10px";
+    localModeStyle.style.left = "10px";
+    localModeStyle.style.background = "rgba(255, 165, 0, 0.8)";
+    localModeStyle.style.color = "black";
+    localModeStyle.style.padding = "5px 10px";
+    localModeStyle.style.borderRadius = "5px";
+    localModeStyle.style.fontSize = "12px";
+    localModeStyle.style.zIndex = "999";
+    localModeStyle.textContent = "Modalità locale (file://)";
+    document.body.appendChild(localModeStyle);
+}
+
 // Console log per verificare caricamento
-console.log("Script admin.js caricato correttamente (versione ottimizzata)");
+console.log("Script admin.js caricato correttamente (versione con supporto file locale)");
