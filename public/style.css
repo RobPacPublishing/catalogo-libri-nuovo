@@ -416,12 +416,12 @@ footer p {
 /* Responsive per mobile */
 @media (max-width: 768px) {
     #titolo-container {
-        font-size: 40px !important; /* Estremamente grande per essere sicuri che si veda */
+        font-size: 28px !important; /* Estremamente grande per essere sicuri che si veda */
         width: 90% !important; /* Assicuriamoci che occupi lo spazio disponibile */
     }
     
     #logo-catalogo {
-        max-width: 120px; /* Aumentato da 100px */
+        max-width: 100px; /* Aumentato da 100px */
     }
     
     #titolo-img {
