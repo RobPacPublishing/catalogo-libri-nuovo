@@ -17,9 +17,8 @@ header {
 
 #logo-container {
     position: absolute;
-    top: 50%;
-    left: 5%;
-    transform: translateY(-50%);
+    top: 10px;
+    left: 10px;
     z-index: 10;
 }
 
@@ -417,11 +416,15 @@ footer p {
 /* Responsive per mobile */
 @media (max-width: 768px) {
     #titolo-container {
-        font-size: 18px;
+        font-size: 22px; /* Aumentato da 18px */
     }
     
     #logo-catalogo {
-        max-width: 100px;
+        max-width: 120px; /* Aumentato da 100px */
+    }
+    
+    #titolo-img, #sottotitolo-img {
+        max-width: 95%; /* Aumentato da 90% */
     }
     
     main {
@@ -537,6 +540,19 @@ footer p {
 
 /* Ottimizzazione per schermi molto piccoli */
 @media (max-width: 480px) {
+    #titolo-container {
+        padding: 15px;
+    }
+    
+    #logo-container {
+        top: 5px;
+        left: 5px;
+    }
+    
+    #logo-catalogo {
+        max-width: 100px;
+    }
+    
     #libri {
         grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
         gap: 10px;
