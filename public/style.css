@@ -416,11 +416,17 @@ footer p {
 /* Responsive per mobile */
 @media (max-width: 768px) {
     #titolo-container {
-        font-size: 36px !important; /* più grande per essere sicuri che si veda */        
+        top: 10px; /* Posiziona in alto */
+        bottom: auto; /* Rimuove il posizionamento bottom */
+        transform: translateX(-50%); /* Solo traslazione orizzontale */
+        width: 90%; /* Assicura che occupi lo spazio disponibile */
+        background-color: rgba(0, 0, 0, 0.5); /* Sfondo scuro semi-trasparente */
+        padding: 10px;
+        border-radius: 5px; /* Angoli arrotondati */
     }
     
     #logo-catalogo {
-        max-width: 100px; /* Aumentato da 100px */
+        max-width: 110px; /* Aumentato da 100px */
     }
     
     #titolo-img {
