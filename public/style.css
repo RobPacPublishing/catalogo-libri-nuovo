@@ -419,7 +419,6 @@ footer p {
         top: 10px; /* Posiziona in alto */
         bottom: auto; /* Rimuove il posizionamento bottom */
         transform: translateX(-50%); /* Solo traslazione orizzontale */
-        width: 90%; /* Assicura che occupi lo spazio disponibile */
         background-color: rgba(0, 0, 0, 0.5); /* Sfondo scuro semi-trasparente */
         padding: 10px;
         border-radius: 5px; /* Angoli arrotondati */
