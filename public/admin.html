@@ -3,196 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pannello di amministrazione</title>
-    <link rel="stylesheet" href="/admin.css?v=4">
-</head>
-<body>
-    <h1>Pannello di amministrazione</h1>
-    
-    <div id="login-container">
-        <button id="login-button">Accedi con Google</button>
-    </div>
-    
-    <div id="admin-panel" style="display: none;">
-        <button id="logout-button">Esci</button>
-        
-        <h2>Inserisci nuovo libro</h2>
-        
-        <!-- 🔔 Messaggio feedback duplicati o errori -->
-        <div id="messaggio-feedback" style="color: red; font-weight: bold; margin-bottom: 10px;"></div>
-        
-        <form id="libro-form">
-            <label for="titolo">Titolo:</label>
-            <input type="text" id="titolo" name="titolo" required>
-            
-            <label for="autore">Autore:</label>
-            <input type="text" id="autore" name="autore" required>
-            
-            <label for="descrizione">Descrizione:</label>
-            <textarea id="descrizione" name="descrizione" required></textarea>
-            
-            <label for="linkAmazon">Link Amazon:</label>
-            <input type="url" id="linkAmazon" name="linkAmazon" required>
-            
-            <label for="immagine">Copertina:</label>
-            <input type="file" id="immagine" name="immagine" accept="image/*">
-            
-            <!-- Genere e sottogenere (opzionali) -->
-            <div class="genere-container">
-                <div class="genere-column">
-                    <label for="genere">Genere (opzionale):</label>
-                    <select id="genere" name="genere">
-                        <option value="">Seleziona genere</option>
-                        <optgroup label="Fiction & Literature">
-                            <option value="Fiction & Literature">Fiction & Literature</option>
-                        </optgroup>
-                        <optgroup label="Sciences & Knowledge">
-                            <option value="Sciences & Knowledge">Sciences & Knowledge</option>
-                        </optgroup>
-                        <optgroup label="Society & Culture">
-                            <option value="Society & Culture">Society & Culture</option>
-                        </optgroup>
-                        <optgroup label="Personal Growth & Wellbeing">
-                            <option value="Personal Growth & Wellbeing">Personal Growth & Wellbeing</option>
-                        </optgroup>
-                        <optgroup label="Lifestyle & Hobbies">
-                            <option value="Lifestyle & Hobbies">Lifestyle & Hobbies</option>
-                        </optgroup>
-                        <optgroup label="In lingua italiana">
-                            <option value="In lingua italiana">In lingua italiana</option>
-                        </optgroup>
-                    </select>
-                    
-                    <!-- Campo per aggiungere un nuovo genere -->
-                    <div id="nuovo-genere-container" style="margin-top: 10px;">
-                        <label for="nuovo-genere">Aggiungi nuovo genere:</label>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="text" id="nuovo-genere" style="flex-grow: 1;">
-                            <button type="button" id="aggiungi-genere" style="width: auto; padding: 5px 10px;">Aggiungi</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="genere-column">
-                    <label for="sottogenere">Sottogenere (opzionale):</label>
-                    <select id="sottogenere" name="sottogenere">
-                        <option value="">Seleziona sottogenere</option>
-                        <!-- Fiction & Literature -->
-                        <optgroup label="Fiction & Literature">
-                            <option value="Literature & Fiction">Literature & Fiction</option>
-                            <option value="Mystery, Thriller & Suspense">Mystery, Thriller & Suspense</option>
-                            <option value="Romance">Romance</option>
-                            <option value="Science Fiction & Fantasy">Science Fiction & Fantasy</option>
-                            <option value="Comics & Graphic Novels">Comics & Graphic Novels</option>
-                            <option value="Humor & Entertainment">Humor & Entertainment</option>
-                            <option value="Teen & Young Adult">Teen & Young Adult</option>
-                            <option value="Children's Books">Children's Books</option>
-                        </optgroup>
-                        <!-- Sciences & Knowledge -->
-                        <optgroup label="Sciences & Knowledge">
-                            <option value="Science & Math">Science & Math</option>
-                            <option value="Computers & Technology">Computers & Technology</option>
-                            <option value="Engineering & Transportation">Engineering & Transportation</option>
-                            <option value="Medical Books">Medical Books</option>
-                            <option value="Education & Teaching">Education & Teaching</option>
-                            <option value="Reference">Reference</option>
-                        </optgroup>
-                        <!-- Society & Culture -->
-                        <optgroup label="Society & Culture">
-                            <option value="History">History</option>
-                            <option value="Politics & Social Sciences">Politics & Social Sciences</option>
-                            <option value="Biographies & Memoirs">Biographies & Memoirs</option>
-                            <option value="Religion & Spirituality">Religion & Spirituality</option>
-                            <option value="Law">Law</option>
-                            <option value="LGBTQ+ Books">LGBTQ+ Books</option>
-                        </optgroup>
-                        <!-- Personal Growth & Wellbeing -->
-                        <optgroup label="Personal Growth & Wellbeing">
-                            <option value="Health, Fitness & Dieting">Health, Fitness & Dieting</option>
-                            <option value="Self-Help">Self-Help</option>
-                            <option value="Business & Money">Business & Money</option>
-                            <option value="Parenting & Relationships">Parenting & Relationships</option>
-                        </optgroup>
-                        <!-- Lifestyle & Hobbies -->
-                        <optgroup label="Lifestyle & Hobbies">
-                            <option value="Arts & Photography">Arts & Photography</option>
-                            <option value="Cookbooks, Food & Wine">Cookbooks, Food & Wine</option>
-                            <option value="Crafts, Hobbies & Home">Crafts, Hobbies & Home</option>
-                            <option value="Sports & Outdoors">Sports & Outdoors</option>
-                            <option value="Travel">Travel</option>
-                            <option value="Calendars">Calendars</option>
-                            <option value="Test Preparation">Test Preparation</option>
-                        </optgroup>
-                        <!-- In lingua italiana -->
-                        <optgroup label="In lingua italiana">
-                            <option value="Narrativa e Letteratura">Narrativa e Letteratura</option>
-                            <option value="Scienze e Conoscenza">Scienze e Conoscenza</option>
-                            <option value="Società e Cultura">Società e Cultura</option>
-                            <option value="Crescita Personale e Benessere">Crescita Personale e Benessere</option>
-                            <option value="Stile di Vita e Hobby">Stile di Vita e Hobby</option>
-                        </optgroup>
-                    </select>
-                    
-                    <!-- Campo per aggiungere un nuovo sottogenere -->
-                    <div id="nuovo-sottogenere-container" style="margin-top: 10px;">
-                        <label for="nuovo-sottogenere">Aggiungi nuovo sottogenere:</label>
-                        <div style="display: flex; gap: 10px;">
-                            <input type="text" id="nuovo-sottogenere" style="flex-grow: 1;">
-                            <button type="button" id="aggiungi-sottogenere" style="width: auto; padding: 5px 10px;">Aggiungi</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <label for="prezzo">Prezzo:</label>
-            <div style="display: flex; gap: 10px;">
-                <select id="valuta" name="valuta" style="width: 60px;">
-                    <option value="$">$</option>
-                    <option value="€">€</option>
-                    <option value="£">£</option>
-                </select>
-                <input type="number" id="prezzo" name="prezzo" step="0.01" required style="flex-grow: 1;">
-            </div>
-            
-            <label for="formati">Formati disponibili:</label><br>
-            <input type="checkbox" id="ebook" name="formati" value="eBook">
-            <label for="ebook">eBook</label>
-            <input type="checkbox" id="paperback" name="formati" value="Paperback">
-            <label for="paperback">Paperback</label>
-            <input type="checkbox" id="hardcover" name="formati" value="Hardcover">
-            <label for="hardcover">Hardcover</label>
-            
-            <button type="submit">Aggiungi libro</button>
-        </form>
-        
-        <h2>Gestione libri</h2>
-        
-        <div id="gestione-libri">
-            <div id="filtro-container">
-                <input type="text" id="filtroTesto" placeholder="Cerca per titolo, autore o genere...">
-                <select id="ordinamento">
-                    <option value="titolo">Ordina per Titolo</option>
-                    <option value="autore">Ordina per Autore</option>
-                    <option value="prezzo">Ordina per Prezzo</option>
-                    <option value="genere">Ordina per Genere</option>
-                    <option value="sottogenere">Ordina per Sottogenere</option>
-                </select>
-            </div>
-            
-            <h3>Libri Inseriti (solo lato admin)</h3>
-            <div id="libri-inseriti"></div>
-        </div>
-        
-        <h2>Backup e Ripristino</h2>
-        <button id="esporta-dati">Esporta JSON</button>
-        <input type="file" id="importa-dati" accept=".json">
-        <button id="carica-dati">Importa JSON</button>
-    </div>
-    
+    <title>RobPac Publishing - Admin Panel</title>
+
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-    <script src="/admin_simple.js?v=4"></script>
+
+    <!-- Stili base opzionali -->
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Contenitore login -->
+    <div id="login-container">
+        <h2>Accesso Amministratore</h2>
+        <button id="login-button">Login con Google</button>
+    </div>
+
+    <!-- Pannello di controllo (visibile dopo login) -->
+    <div id="admin-panel" style="display: none;">
+        <h1>Catalogo Libri - RobPac Publishing</h1>
+        <button id="logout-button">Logout</button>
+
+        <!-- Form per inserimento libri -->
+        <form id="libro-form">
+            <input type="text" id="titolo" placeholder="Titolo" required><br>
+            <input type="text" id="autore" placeholder="Autore" required><br>
+            <textarea id="descrizione" placeholder="Descrizione"></textarea><br>
+            <input type="text" id="linkAmazon" placeholder="Link Amazon"><br>
+            <input type="number" id="prezzo" step="0.01" placeholder="Prezzo"><br>
+            <input type="text" id="valuta" placeholder="Valuta" value="$"><br>
+
+            <select id="genere">
+                <option value="">Seleziona genere</option>
+            </select>
+            <input type="text" id="nuovo-genere" placeholder="Aggiungi nuovo genere">
+            <button type="button" id="aggiungi-genere">+</button><br>
+
+            <select id="sottogenere">
+                <option value="">Seleziona sottogenere</option>
+            </select>
+            <input type="text" id="nuovo-sottogenere" placeholder="Aggiungi nuovo sottogenere">
+            <button type="button" id="aggiungi-sottogenere">+</button><br>
+
+            <input type="file" id="immagine" accept="image/*"><br><br>
+
+            <!-- Formati (attualmente disabilitati nel JS) -->
+            <label><input type="checkbox" id="ebook"> eBook</label>
+            <label><input type="checkbox" id="paperback"> Paperback</label>
+            <label><input type="checkbox" id="hardcover"> Hardcover</label><br><br>
+
+            <button type="submit">Aggiungi libro</button>
+        </form>
+
+        <!-- Filtri -->
+        <hr>
+        <input type="text" id="filtroTesto" placeholder="Cerca per titolo, autore o genere">
+        <select id="ordinamento">
+            <option value="">Ordina per...</option>
+            <option value="titolo">Titolo</option>
+            <option value="autore">Autore</option>
+            <option value="prezzo">Prezzo</option>
+        </select>
+
+        <!-- Area elenco libri -->
+        <div id="libri-inseriti"></div>
+    </div>
+
+    <!-- Messaggi feedback -->
+    <div id="messaggio-feedback" style="display: none;"></div>
+
+    <!-- Script principale -->
+    <script src="admin_simple.js"></script>
 </body>
 </html>
