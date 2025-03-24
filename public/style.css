@@ -426,12 +426,12 @@ footer p {
     
     #titolo-img {
         max-width: 100% !important; /* Occupa tutta la larghezza disponibile */
-        height: auto !important;
+        transform: scale(1.2);
     }
     
     #sottotitolo-img {
         max-width: 100% !important;
-        height: auto !important;
+        transform: scale(1.2);
     }
     
     main {
