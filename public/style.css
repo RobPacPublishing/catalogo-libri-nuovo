@@ -416,7 +416,7 @@ footer p {
 /* Responsive per mobile */
 @media (max-width: 768px) {
     #titolo-container {
-        font-size: 28px !important; /* Estremamente grande per essere sicuri che si veda */        
+        font-size: 36px !important; /* più grande per essere sicuri che si veda */        
     }
     
     #logo-catalogo {
