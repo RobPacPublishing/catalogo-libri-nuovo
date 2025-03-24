@@ -10,7 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
-    <!-- Stili base opzionali -->
+    <!-- Stili base -->
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
@@ -27,44 +27,86 @@
 
         <!-- Form per inserimento libri -->
         <form id="libro-form">
-            <input type="text" id="titolo" placeholder="Titolo" required><br>
-            <input type="text" id="autore" placeholder="Autore" required><br>
-            <textarea id="descrizione" placeholder="Descrizione"></textarea><br>
-            <input type="text" id="linkAmazon" placeholder="Link Amazon"><br>
-            <input type="number" id="prezzo" step="0.01" placeholder="Prezzo"><br>
-            <input type="text" id="valuta" placeholder="Valuta" value="$"><br>
+            <h2>Inserisci un nuovo libro</h2>
 
+            <label for="titolo">Titolo</label>
+            <input type="text" id="titolo" placeholder="Titolo del libro" required>
+            
+            <label for="autore">Autore</label>
+            <input type="text" id="autore" placeholder="Nome dell'autore" required>
+            
+            <label for="descrizione">Descrizione</label>
+            <textarea id="descrizione" placeholder="Descrizione del libro" rows="4"></textarea>
+            
+            <label for="linkAmazon">Link Amazon</label>
+            <input type="url" id="linkAmazon" placeholder="URL Amazon del libro">
+            
+            <div style="display: flex; gap: 10px;">
+                <div style="flex: 1;">
+                    <label for="prezzo">Prezzo</label>
+                    <input type="number" id="prezzo" step="0.01" placeholder="Prezzo" min="0">
+                </div>
+                <div style="width: 80px;">
+                    <label for="valuta">Valuta</label>
+                    <input type="text" id="valuta" placeholder="Valuta" value="$">
+                </div>
+            </div>
+
+            <label for="genere">Genere</label>
             <select id="genere">
                 <option value="">Seleziona genere</option>
+                <option value="Fiction & Literature">Fiction & Literature</option>
+                <option value="Sciences & Knowledge">Sciences & Knowledge</option>
+                <option value="Society & Culture">Society & Culture</option>
+                <option value="Personal Growth & Wellbeing">Personal Growth & Wellbeing</option>
+                <option value="Lifestyle & Hobbies">Lifestyle & Hobbies</option>
+                <option value="In lingua italiana">In lingua italiana</option>
             </select>
-            <input type="text" id="nuovo-genere" placeholder="Aggiungi nuovo genere">
-            <button type="button" id="aggiungi-genere">+</button><br>
-
+            
+            <label for="sottogenere">Sottogenere</label>
             <select id="sottogenere">
                 <option value="">Seleziona sottogenere</option>
             </select>
-            <input type="text" id="nuovo-sottogenere" placeholder="Aggiungi nuovo sottogenere">
-            <button type="button" id="aggiungi-sottogenere">+</button><br>
 
-            <input type="file" id="immagine" accept="image/*"><br><br>
+            <label for="immagine">Immagine Copertina</label>
+            <input type="file" id="immagine" accept="image/*">
+            <div id="immagine-preview" style="display: none; margin-top: 10px;">
+                <img id="preview-img" src="" alt="Anteprima immagine" style="max-width: 200px;">
+                <button type="button" id="rimuovi-immagine" style="display: block; margin-top: 5px;">Rimuovi immagine</button>
+            </div>
 
             <!-- Formati (attualmente disabilitati nel JS) -->
-            <label><input type="checkbox" id="ebook"> eBook</label>
-            <label><input type="checkbox" id="paperback"> Paperback</label>
-            <label><input type="checkbox" id="hardcover"> Hardcover</label><br><br>
+            <div class="formati-container">
+                <label><input type="checkbox" id="ebook"> eBook</label>
+                <label><input type="checkbox" id="paperback"> Paperback</label>
+                <label><input type="checkbox" id="hardcover"> Hardcover</label>
+            </div>
 
             <button type="submit">Aggiungi libro</button>
         </form>
 
+        <!-- Strumenti di gestione -->
+        <div style="margin: 20px 0; display: flex; gap: 10px; justify-content: center;">
+            <button id="esporta-dati" type="button">Esporta Dati</button>
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+                <input type="file" id="importa-dati" accept=".json">
+                <button id="carica-dati" type="button">Importa Dati</button>
+            </div>
+        </div>
+
         <!-- Filtri -->
-        <hr>
-        <input type="text" id="filtroTesto" placeholder="Cerca per titolo, autore o genere">
-        <select id="ordinamento">
-            <option value="">Ordina per...</option>
-            <option value="titolo">Titolo</option>
-            <option value="autore">Autore</option>
-            <option value="prezzo">Prezzo</option>
-        </select>
+        <div style="margin: 20px 0;">
+            <h2>Libri nel Catalogo</h2>
+            <div id="filtro-container">
+                <input type="text" id="filtroTesto" placeholder="Cerca per titolo o autore">
+                <select id="ordinamento">
+                    <option value="">Ordina per...</option>
+                    <option value="titolo">Titolo</option>
+                    <option value="autore">Autore</option>
+                    <option value="prezzo">Prezzo</option>
+                </select>
+            </div>
+        </div>
 
         <!-- Area elenco libri -->
         <div id="libri-inseriti"></div>
@@ -74,6 +116,6 @@
     <div id="messaggio-feedback" style="display: none;"></div>
 
     <!-- Script principale -->
-    <script src="admin_simple.js"></script>
+    <script src="admin.js"></script>
 </body>
 </html>
