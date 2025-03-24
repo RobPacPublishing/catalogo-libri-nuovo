@@ -416,7 +416,7 @@ footer p {
 /* Responsive per mobile */
 @media (max-width: 768px) {
     #titolo-container {
-        top: 10px; /* Posiziona in alto */
+        top: 5px; /* Posiziona in alto */
         bottom: auto; /* Rimuove il posizionamento bottom */
         transform: translateX(-50%); /* Solo traslazione orizzontale */
         padding: 0; /* Rimuove il padding dal contenitore */
