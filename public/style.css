@@ -416,16 +416,22 @@ footer p {
 /* Responsive per mobile */
 @media (max-width: 768px) {
     #titolo-container {
-        font-size: 28px !important; /* Aumentato molto per essere più visibile */
+        font-size: 40px !important; /* Estremamente grande per essere sicuri che si veda */
+        width: 90% !important; /* Assicuriamoci che occupi lo spazio disponibile */
     }
     
     #logo-catalogo {
         max-width: 120px; /* Aumentato da 100px */
     }
     
-    #titolo-img, #sottotitolo-img {
-        max-width: 100% !important; /* Massima larghezza */
-        transform: scale(1.2); /* Ingrandisce del 20% */
+    #titolo-img {
+        max-width: 100% !important; /* Occupa tutta la larghezza disponibile */
+        height: auto !important;
+    }
+    
+    #sottotitolo-img {
+        max-width: 100% !important;
+        height: auto !important;
     }
     
     main {
@@ -543,7 +549,7 @@ footer p {
 @media (max-width: 480px) {
     #titolo-container {
         padding: 15px;
-        font-size: 24px !important;
+        font-size: 32px !important;
     }
     
     #logo-container {
@@ -556,7 +562,7 @@ footer p {
     }
     
     #titolo-img, #sottotitolo-img {
-        transform: scale(1.1); /* Leggermente più grande */
+        transform: scale(1.4); /* Leggermente più grande */
     }
     
     #libri {
