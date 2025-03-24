@@ -570,3 +570,112 @@ button:disabled {
         height: 120px;
     }
 }
+
+/* Miglioramenti per dispositivi mobili */
+@media (max-width: 768px) {
+    /* Aumenta la dimensione del testo base */
+    body {
+        font-size: 16px;
+    }
+    
+    /* Titoli più grandi */
+    h1 {
+        font-size: 28px;
+    }
+    
+    h2 {
+        font-size: 24px;
+    }
+    
+    h3 {
+        font-size: 18px;
+    }
+    
+    /* Form più leggibile */
+    input[type="text"],
+    input[type="url"],
+    input[type="number"],
+    textarea,
+    select {
+        font-size: 16px;
+        padding: 12px;
+    }
+    
+    /* Pulsanti più grandi e facili da toccare */
+    button {
+        font-size: 18px;
+        padding: 14px 20px;
+        min-height: 50px;
+    }
+    
+    /* Card dei libri con testo più grande */
+    .admin-libro p {
+        font-size: 14px;
+        margin: 6px 0;
+    }
+    
+    .admin-libro-buttons button {
+        font-size: 16px;
+        padding: 10px 5px;
+        min-height: 44px;
+    }
+    
+    /* Modal con testo più grande */
+    .modal-content {
+        font-size: 16px;
+    }
+    
+    .libro-info h2 {
+        font-size: 24px;
+    }
+    
+    .libro-info p {
+        font-size: 16px;
+    }
+    
+    .libro-descrizione p {
+        font-size: 16px;
+        line-height: 1.6;
+    }
+    
+    /* Notifiche più grandi */
+    #notifica {
+        font-size: 18px;
+        padding: 15px 20px;
+    }
+    
+    /* Finestra di conferma più grande */
+    .notifica-conferma {
+        width: 90%;
+        max-width: 350px;
+        padding: 25px;
+    }
+    
+    .notifica-conferma p {
+        font-size: 18px;
+    }
+    
+    .notifica-conferma button {
+        font-size: 18px;
+        padding: 12px 18px;
+    }
+}
+
+/* Miglioramenti per schermi molto piccoli */
+@media (max-width: 480px) {
+    .admin-libro {
+        height: auto;
+        min-height: 370px;
+    }
+    
+    /* Stack verticale per i pulsanti su schermi molto piccoli */
+    .admin-libro-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .admin-libro-buttons button {
+        margin-top: 3px;
+    }
+}
