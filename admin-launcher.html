@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RobPac Publishing - Admin Panel Launcher</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .info {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            text-align: left;
+        }
+        
+        .info p {
+            margin: 5px 0;
+        }
+        
+        img.logo {
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="public/logo3senzasfondo.png" alt="RobPac Publishing Logo" class="logo">
+        <h1>RobPac Publishing<br>Admin Panel</h1>
+        
+        <div class="buttons">
+            <button onclick="location.href='public/admin.html'">Apri Admin Panel</button>
+        </div>
+        
+        <div class="info">
+            <p><strong>Informazioni:</strong></p>
+            <p>- Funziona in modalità offline (senza server)</p>
+            <p>- I dati vengono salvati in locale nel browser</p>
+            <p>- Puoi esportare/importare dati tramite file JSON</p>
+            <p>- Per sincronizzare con Firebase, accedi online</p>
+        </div>
+    </div>
+    
+    <script>
+        // Script per verificare che il file funzioni correttamente
+        console.log("Admin Launcher caricato correttamente");
+        
+        // Reindirizza automaticamente dopo 100ms
+        // Questo permette di vedere brevemente questa pagina prima di andare all'admin panel
+        setTimeout(() => {
+            window.location.href = "public/admin.html";
+        }, 100);
+    </script>
+</body>
+</html>
