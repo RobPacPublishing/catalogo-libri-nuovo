@@ -425,7 +425,7 @@ footer p {
     
     /* Aggiunge background solo alle immagini */
     #titolo-img, #sottotitolo-img {
-        background-color: rgba(0, 0, 0, 0.3); /* Sfondo scuro più leggero */
+        background-color: rgba(0, 0, 0, 0.2); /* Sfondo scuro più leggero */
         padding: 5px 10px;
         border-radius: 5px;
         margin: 5px auto; /* Aggiunge spazio tra le righe */
@@ -437,12 +437,12 @@ footer p {
     
     #titolo-img {
         max-width: 100% !important; /* Occupa tutta la larghezza disponibile */
-        transform: scale(1.1);
+        transform: scale(1.2);
     }
     
     #sottotitolo-img {
         max-width: 100% !important;
-        transform: scale(1.1);
+        transform: scale(1.2);
     }
     
     main {
