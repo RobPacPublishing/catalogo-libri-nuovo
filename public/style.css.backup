@@ -17,8 +17,9 @@ header {
 
 #logo-container {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 50%;
+    left: 5%;
+    transform: translateY(-50%);
     z-index: 10;
 }
 
@@ -416,16 +417,11 @@ footer p {
 /* Responsive per mobile */
 @media (max-width: 768px) {
     #titolo-container {
-        font-size: 28px !important; /* Aumentato molto per essere più visibile */
+        font-size: 18px;
     }
     
     #logo-catalogo {
-        max-width: 120px; /* Aumentato da 100px */
-    }
-    
-    #titolo-img, #sottotitolo-img {
-        max-width: 100% !important; /* Massima larghezza */
-        transform: scale(1.2); /* Ingrandisce del 20% */
+        max-width: 100px;
     }
     
     main {
@@ -541,24 +537,6 @@ footer p {
 
 /* Ottimizzazione per schermi molto piccoli */
 @media (max-width: 480px) {
-    #titolo-container {
-        padding: 15px;
-        font-size: 24px !important;
-    }
-    
-    #logo-container {
-        top: 5px;
-        left: 5px;
-    }
-    
-    #logo-catalogo {
-        max-width: 100px;
-    }
-    
-    #titolo-img, #sottotitolo-img {
-        transform: scale(1.1); /* Leggermente più grande */
-    }
-    
     #libri {
         grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
         gap: 10px;
