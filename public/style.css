@@ -419,9 +419,16 @@ footer p {
         top: 10px; /* Posiziona in alto */
         bottom: auto; /* Rimuove il posizionamento bottom */
         transform: translateX(-50%); /* Solo traslazione orizzontale */
-        background-color: rgba(0, 0, 0, 0.5); /* Sfondo scuro semi-trasparente */
-        padding: 10px;
-        border-radius: 5px; /* Angoli arrotondati */
+        padding: 0; /* Rimuove il padding dal contenitore */
+        background-color: transparent; /* Rimuove il background dal contenitore */
+    }
+    
+    /* Aggiunge background solo alle immagini */
+    #titolo-img, #sottotitolo-img {
+        background-color: rgba(0, 0, 0, 0.3); /* Sfondo scuro più leggero */
+        padding: 5px 10px;
+        border-radius: 5px;
+        margin: 5px auto; /* Aggiunge spazio tra le righe */
     }
     
     #logo-catalogo {
